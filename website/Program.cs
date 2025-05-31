@@ -1,6 +1,7 @@
 using website.Components;
 using website.Extensions;
 using Serilog;
+using website.Services;
 
 // Load environment variables from .env file
 DotNetEnv.Env.Load();
@@ -47,5 +48,10 @@ app.MapAuthenticationEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+ThumbnailGenerator.GenerateThumbnails(
+    "wwwroot/images/gallery/",
+    "wwwroot/images/thumbs/"
+);
 
 app.Run();
