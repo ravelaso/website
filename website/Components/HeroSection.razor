@@ -57,142 +57,226 @@
                 </a>
             </div>
         </div>
-
-        <!-- Description -->
-        <p class="text-xl sm:text-2xl text-gray-400 mb-16 max-w-4xl mx-auto leading-relaxed font-light">
-            Creative professional blending technology, music, and visual storytelling.<br class="hidden sm:block">
-            <span class="text-gray-500">Passionate about building digital experiences, composing melodies, and capturing moments that matter.</span>
-        </p>
     </div>
 
 </section>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 🎛️ PHYSICS CONFIGURATION - Tweak these values!
+    const CONFIG = {
+        // Movement Physics
+        INITIAL_VELOCITY: 0.03,        // How fast they start moving (0.1 = faster, 0.01 = slower)
+        MAX_SPEED: 0.08,               // Maximum speed limit (0.15 = faster, 0.05 = slower)
+        FRICTION: 0.895,               // How much they slow down (0.98 = more friction, 0.999 = less friction)
+
+        // Gravity & Positioning
+        RETURN_FORCE: 0.003,           // How strong the pull back to original position (0.002 = stronger, 0.0005 = weaker)
+        BOUNDARY_PUSH: 0.005,          // How hard they bounce off edges (0.01 = harder, 0.001 = softer)
+
+        // Collision Detection
+        COLLISION_RADIUS: 3,           // How close before they push apart (8 = more spacing, 4 = less spacing)
+        COLLISION_FORCE: 0.02,         // How hard they push each other (0.02 = harder, 0.005 = softer)
+
+        // Mouse Interaction
+        MOUSE_DISTANCE: 10,            // How close mouse needs to be for effects (12 = further, 6 = closer)
+        MOUSE_REPEL_FORCE: 0.05,       // How hard mouse pushes them away (0.1 = stronger, 0.02 = weaker)
+
+        // Visual Effects
+        GLOW_MAX_SIZE: 40,             // Maximum glow size (60 = bigger, 20 = smaller)
+        SCALE_MAX: 0.2,                // Maximum scale increase (0.3 = bigger, 0.1 = smaller)
+
+        // Performance
+        TARGET_FPS: 60,                // Animation frame rate
+        BOUNDARY_MARGIN: 5             // Distance from edges before boundary push
+    };
+
     const heroSection = document.getElementById('hero-section');
     const floatingElements = document.querySelectorAll('.floating-element');
 
+    // Performance optimization: cache elements data
+    const elementsData = Array.from(floatingElements).map((element, index) => ({
+        element,
+        id: index,
+        x: parseFloat(element.style.left),
+        y: parseFloat(element.style.top),
+        vx: (Math.random() - 0.5) * CONFIG.INITIAL_VELOCITY,
+        vy: (Math.random() - 0.5) * CONFIG.INITIAL_VELOCITY,
+        radius: CONFIG.COLLISION_RADIUS,
+        originalX: parseFloat(element.style.left),
+        originalY: parseFloat(element.style.top)
+    }));
+
+    let animationId;
+    let lastTime = 0;
+    const frameTime = 1000 / CONFIG.TARGET_FPS;
+
+    // High-performance animation loop
+    function animate(currentTime) {
+        if (currentTime - lastTime >= frameTime) {
+            updatePositions();
+            checkCollisions();
+            lastTime = currentTime;
+        }
+        animationId = requestAnimationFrame(animate);
+    }
+
+    function updatePositions() {
+        elementsData.forEach(data => {
+            // Gentle gravity towards original position
+            const dx = data.originalX - data.x;
+            const dy = data.originalY - data.y;
+
+            data.vx += dx * CONFIG.RETURN_FORCE;
+            data.vy += dy * CONFIG.RETURN_FORCE;
+
+            // Apply friction
+            data.vx *= CONFIG.FRICTION;
+            data.vy *= CONFIG.FRICTION;
+
+            // Update positions
+            data.x += data.vx;
+            data.y += data.vy;
+
+            // Soft boundary constraints
+            if (data.x < CONFIG.BOUNDARY_MARGIN) {
+                data.vx += (CONFIG.BOUNDARY_MARGIN - data.x) * CONFIG.BOUNDARY_PUSH;
+            }
+            if (data.x > 95 - CONFIG.BOUNDARY_MARGIN) {
+                data.vx -= (data.x - (95 - CONFIG.BOUNDARY_MARGIN)) * CONFIG.BOUNDARY_PUSH;
+            }
+            if (data.y < CONFIG.BOUNDARY_MARGIN) {
+                data.vy += (CONFIG.BOUNDARY_MARGIN - data.y) * CONFIG.BOUNDARY_PUSH;
+            }
+            if (data.y > 95 - CONFIG.BOUNDARY_MARGIN) {
+                data.vy -= (data.y - (95 - CONFIG.BOUNDARY_MARGIN)) * CONFIG.BOUNDARY_PUSH;
+            }
+
+            // Apply position
+            data.element.style.left = `${data.x}%`;
+            data.element.style.top = `${data.y}%`;
+        });
+    }
+
+    function checkCollisions() {
+        for (let i = 0; i < elementsData.length; i++) {
+            for (let j = i + 1; j < elementsData.length; j++) {
+                const a = elementsData[i];
+                const b = elementsData[j];
+
+                const dx = a.x - b.x;
+                const dy = a.y - b.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Collision detected
+                if (distance < a.radius) {
+                    const angle = Math.atan2(dy, dx);
+
+                    // Push elements apart
+                    a.vx += Math.cos(angle) * CONFIG.COLLISION_FORCE;
+                    a.vy += Math.sin(angle) * CONFIG.COLLISION_FORCE;
+                    b.vx -= Math.cos(angle) * CONFIG.COLLISION_FORCE;
+                    b.vy -= Math.sin(angle) * CONFIG.COLLISION_FORCE;
+
+                    // Limit velocity
+                    a.vx = Math.max(-CONFIG.MAX_SPEED, Math.min(CONFIG.MAX_SPEED, a.vx));
+                    a.vy = Math.max(-CONFIG.MAX_SPEED, Math.min(CONFIG.MAX_SPEED, a.vy));
+                    b.vx = Math.max(-CONFIG.MAX_SPEED, Math.min(CONFIG.MAX_SPEED, b.vx));
+                    b.vy = Math.max(-CONFIG.MAX_SPEED, Math.min(CONFIG.MAX_SPEED, b.vy));
+                }
+            }
+        }
+    }
+
+    // Mouse interaction
+    let mouseX = 0, mouseY = 0;
+    let isMouseMoving = false;
+
     heroSection.addEventListener('mousemove', function(e) {
         const rect = heroSection.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
+        mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+        mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+        isMouseMoving = true;
 
-        floatingElements.forEach(element => {
-            const elementRect = element.getBoundingClientRect();
-            const elementCenterX = elementRect.left + elementRect.width / 2 - rect.left;
-            const elementCenterY = elementRect.top + elementRect.height / 2 - rect.top;
+        requestAnimationFrame(updateMouseEffects);
+    });
 
-            const distanceX = mouseX - elementCenterX;
-            const distanceY = mouseY - elementCenterY;
-            const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+    function updateMouseEffects() {
+        if (!isMouseMoving) return;
 
-            if (distance < 120) {
-                const intensity = Math.max(0, (120 - distance) / 120);
-                const glowSize = Math.round(intensity * 60);
+        elementsData.forEach(data => {
+            const dx = mouseX - data.x;
+            const dy = mouseY - data.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < CONFIG.MOUSE_DISTANCE) {
+                const intensity = Math.max(0, (CONFIG.MOUSE_DISTANCE - distance) / CONFIG.MOUSE_DISTANCE);
+                const glowSize = Math.round(intensity * CONFIG.GLOW_MAX_SIZE);
                 const opacity = intensity * 2;
                 const brightness = 1 + intensity * 2;
-                const scale = 1 + intensity * 0.3;
+                const scale = 1 + intensity * CONFIG.SCALE_MAX;
 
-                // Ultra-bright, instant glow
-                element.style.filter = `
+                // Glow effect
+                data.element.style.filter = `
                     drop-shadow(0 0 ${glowSize}px rgba(0, 150, 255, ${opacity}))
                     drop-shadow(0 0 ${glowSize * 1.5}px rgba(100, 200, 255, ${opacity * 0.8}))
                     brightness(${brightness})
                 `;
-                element.style.transform = `scale(${scale})`;
-                // INSTANT transition in
-                element.style.transition = 'none';
+                data.element.style.transform = `scale(${scale})`;
+                data.element.style.transition = 'none';
+
+                // Mouse repulsion
+                const angle = Math.atan2(data.y - mouseY, data.x - mouseX);
+                data.vx += Math.cos(angle) * CONFIG.MOUSE_REPEL_FORCE * intensity;
+                data.vy += Math.sin(angle) * CONFIG.MOUSE_REPEL_FORCE * intensity;
             } else {
-                // Quick fade out
-                element.style.filter = '';
-                element.style.transform = '';
-                element.style.transition = 'filter 0.15s ease-out, transform 0.15s ease-out';
+                // Reset effects
+                data.element.style.filter = '';
+                data.element.style.transform = '';
+                data.element.style.transition = 'filter 0.15s ease-out, transform 0.15s ease-out';
             }
+        });
+
+        isMouseMoving = false;
+    }
+
+    heroSection.addEventListener('mouseleave', function() {
+        elementsData.forEach(data => {
+            data.element.style.filter = '';
+            data.element.style.transform = '';
+            data.element.style.transition = 'filter 0.2s ease-out, transform 0.2s ease-out';
         });
     });
 
-    heroSection.addEventListener('mouseleave', function() {
-        floatingElements.forEach(element => {
-            element.style.filter = '';
-            element.style.transform = '';
-            element.style.transition = 'filter 0.2s ease-out, transform 0.2s ease-out';
-        });
+    // Start the animation loop
+    animate(0);
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
     });
 });
 </script>
 
-
 <style>
     .floating-element {
-        will-change: transform;
-    }
-
-    /* Molecular movement animations */
-    @@keyframes float-1 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(30px, -20px) rotate(360deg); }
-    }
-
-    @@keyframes float-2 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(-25px, 35px) rotate(-360deg); }
-    }
-
-    @@keyframes float-3 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(40px, 15px) rotate(180deg); }
-    }
-
-    @@keyframes float-4 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(-35px, -25px) rotate(-180deg); }
-    }
-
-    @@keyframes float-5 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(20px, 40px) rotate(270deg); }
-    }
-
-    @@keyframes float-6 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(-30px, -15px) rotate(-270deg); }
-    }
-
-    @@keyframes float-7 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(35px, -30px) rotate(90deg); }
-    }
-
-    @@keyframes float-8 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(-20px, 25px) rotate(-90deg); }
-    }
-
-    @@keyframes float-9 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(45px, 10px) rotate(450deg); }
-    }
-
-    @@keyframes float-10 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(-40px, -35px) rotate(-450deg); }
-    }
-
-    @@keyframes float-11 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(15px, -40px) rotate(135deg); }
-    }
-
-    @@keyframes float-12 {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        100% { transform: translate(-45px, 20px) rotate(-135deg); }
+        will-change: transform, left, top;
     }
 </style>
 
+
 @code {
-    private int ElementCount = 30; // Easy to configure!
+    private int ElementCount = 50;
     private List<FloatingElement> FloatingElements = new();
+
+    private int GetIconCountForDevice()
+    {
+        // We'll determine this via JavaScript since we can't detect screen size server-side
+        // Default to mobile-friendly count for SSR, then JS will adjust
+        return 8; // Safe default
+    }
 
     protected override void OnInitialized()
     {
@@ -203,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {
         var random = new Random();
         var svgIcons = GetSvgIcons();
-        var sizes = new[] { "w-10 h-10", "w-15 h-15", "w-20 h-20", "w-25 h-25" };
+        var sizes = new[] { "w-6 h-6", "w-7 h-7", "w-8 h-8", "w-10 h-10" };
         var opacities = new[] { "opacity-20" };
         var colors = new[] { "text-gray-300" };
 
@@ -217,25 +301,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 SizeClass = sizes[random.Next(sizes.Length)],
                 OpacityClass = opacities[random.Next(opacities.Length)],
                 ColorClass = colors[random.Next(colors.Length)],
-                AnimationIndex = random.Next(1, 13), // 12 different animations
-                Duration = random.Next(8, 20), // 8-20 seconds
+                AnimationIndex = 0, // Disabled - handled by JS
+                Duration = 0, // Disabled
                 DurationUnit = "s"
             });
         }
     }
 
-    private List<string> GetSvgIcons()
+
+private List<string> GetSvgIcons()
 {
     return new List<string>
     {
-        // Music Icons
-        """<path d="M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z"/>""",
+        // 🎵 Music Icons
 
-        // Code Icons
-        """<path d="M4.708 5.578L2.061 8.224l2.647 2.646-.708.708-3-3V7.87l3-3 .708.708zm7-.708L11 5.578l2.647 2.646L11 10.87l.708.708 3-3V7.87l-3-3zM4.908 13l.894.448 5-10L9.908 3l-5 10z"/>""",
+        """<ellipse cx="7" cy="17" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M9 17V6l7-2v11"/><ellipse cx="14" cy="15" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/>""", // Double notes with stems
 
-        // Camera Icons
-        """<path fill="#444" d="M11 9c0 1.657-1.343 3-3 3s-3-1.343-3-3c0-1.657 1.343-3 3-3s3 1.343 3 3z"></path><path fill="#444" d="M11 4v-3h-6v3h-5v9h5c0.8 0.6 1.9 1 3 1s2.2-0.4 3-1h5v-9h-5zM6 2h4v2h-4v-2zM8 13c-2.2 0-4-1.8-4-4s1.8-4 4-4c2.2 0 4 1.8 4 4s-1.8 4-4 4zM15 6h-2v-1h2v1z"></path> """,
+        // 📷 Camera Icons
+        """<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M14.5 4h-5L7 6H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3l-2.5-2z"/><circle cx="12" cy="13" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>""", // Perfect camera
+
+        """<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="16" cy="8" r="1" fill="currentColor"/>""", // Camera lens
 
     };
 }
@@ -252,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
         public int AnimationIndex { get; set; }
         public int Duration { get; set; }
         public string DurationUnit { get; set; } = "s";
-        public string AnimationString => $"float-{AnimationIndex} {Duration}{DurationUnit} ease-in-out infinite alternate";
-
+        public string AnimationString => ""; // No CSS animation
     }
+
 }
