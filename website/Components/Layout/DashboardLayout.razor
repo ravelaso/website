@@ -1,0 +1,76 @@
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using website.Services
+@inject AuthorizationService AuthService
+@inject NavigationManager Navigation
+@inherits LayoutComponentBase
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthService.IsAuthorized(context.User))
+            {
+                <div class="min-h-screen bg-black text-white">
+                    <!-- Dashboard Header -->
+                    <div class="bg-gray-900 border-b border-gray-800">
+                        <div class="container mx-auto px-4 py-4">
+                            <div class="flex justify-between items-center">
+                                <h1 class="text-2xl font-bold text-white">Dashboard</h1>
+                                <div class="text-gray-400 text-sm">
+                                    Welcome, @AuthService.GetUserName(context.User)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Navigation -->
+                    <nav class="bg-gray-950 border-b border-gray-800">
+                        <div class="container mx-auto px-4">
+                            <ul class="flex space-x-8 py-3">
+                                <li>
+                                    <a href="/dashboard/images"
+                                       class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md transition-colors duration-200">
+                                        📸 Image Gallery
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/dashboard/music"
+                                       class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md transition-colors duration-200">
+                                        🎵 Music
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/dashboard/projects"
+                                       class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md transition-colors duration-200">
+                                        💻 Projects
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+
+                    <!-- Main Content -->
+                    <main class="py-8">
+                        <div class="container mx-auto px-4">
+                            @Body
+                        </div>
+                    </main>
+                </div>
+            }
+            else
+            {
+                <div class="min-h-screen bg-black text-white flex items-center justify-center">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-2">Access Denied</h3>
+                        <p class="text-gray-400">You are not authorized to access this dashboard.</p>
+                    </div>
+                </div>
+            }
+        </Authorized>
+        <NotAuthorized>
+            @{
+                Navigation.NavigateTo("/", true);
+            }
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

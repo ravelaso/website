@@ -1,25 +1,9 @@
 @page "/dashboard"
-@using Microsoft.AspNetCore.Components.Authorization
-@using website.Services
-@inject AuthorizationService AuthService
 @inject NavigationManager Navigation
 
-<PageTitle>Dashboard</PageTitle>
-
-<AuthorizeView>
-    <Authorized>
-        <div class="container">
-            <h1 class="text-center"> DASHBOARD </h1>
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        @{
-            Navigation.NavigateTo("/", true);
-        }
-        ;
-    </NotAuthorized>
-</AuthorizeView>
-
 @code {
-
+    protected override void OnInitialized()
+    {
+        Navigation.NavigateTo("/dashboard/images", true);
+    }
 }
