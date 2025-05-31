@@ -11,20 +11,61 @@ else
         {
             var fileName = Path.GetFileName(path);
             <div class="masonry-item">
-                <a href="@($"/images/gallery/{fileName}")"
-                   class="glightbox block"
-                   data-gallery="gallery1"
-                   data-title="@Path.GetFileNameWithoutExtension(path)">
+                <div class="image-wrapper" @onclick="() => OpenModal(fileName)">
                     <img
                         src="@($"/images/thumbs/{fileName}")"
                         alt="Gallery Image"
                         loading="lazy"
                         class="masonry-image"
                     />
-                </a>
+                    <div class="image-overlay">
+                        <svg class="zoom-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
+                        </svg>
+                    </div>
+                </div>
             </div>
         }
     </div>
+
+    <!-- 🖼️ MODAL WINDOW -->
+    @if (_isModalOpen && !string.IsNullOrEmpty(_selectedImage))
+    {
+        <div class="modal-backdrop" @onclick="CloseModal">
+            <div class="modal-container" @onclick:stopPropagation="true">
+                <!-- Close Button -->
+                <button class="modal-close" @onclick="CloseModal" aria-label="Close">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <!-- Image -->
+                <div class="modal-image-wrapper">
+                    <img
+                        src="@($"/images/gallery/{_selectedImage}")"
+                        alt="Full size image"
+                        class="modal-image"
+                        @onload="() => _imageLoaded = true"
+                    />
+
+                    <!-- Loading spinner -->
+                    @if (!_imageLoaded)
+                    {
+                        <div class="modal-loading">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Image Info -->
+                <div class="modal-info">
+                    <h3 class="modal-title">@Path.GetFileNameWithoutExtension(_selectedImage)</h3>
+                    <p class="modal-subtitle">Click outside to close</p>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 <style>
@@ -47,7 +88,14 @@ else
     background: white;
 }
 
-.masonry-item:hover {
+.image-wrapper {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 0.75rem;
+}
+
+.image-wrapper:hover {
     transform: translateY(-4px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
@@ -60,8 +108,164 @@ else
     transition: transform 0.3s ease;
 }
 
-.masonry-item:hover .masonry-image {
-    transform: scale(1.02);
+.image-wrapper:hover .masonry-image {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 0.75rem;
+}
+
+.image-wrapper:hover .image-overlay {
+    opacity: 1;
+}
+
+.zoom-icon {
+    width: 3rem;
+    height: 3rem;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* 🖼️ MODAL STYLES */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-container {
+    position: relative;
+    max-width: 95vw;
+    max-height: 95vh;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 3rem;
+    height: 3rem;
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.modal-close:hover {
+    background: rgba(255, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+.modal-close svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.modal-image-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.modal-image {
+    max-width: 100%;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 1rem 1rem 0 0;
+}
+
+.modal-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.modal-info {
+    padding: 1.5rem;
+    text-align: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+}
+
+.modal-subtitle {
+    color: #6b7280;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/* 🎬 ANIMATIONS */
+@@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-2rem);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* 📱 Responsive breakpoints */
@@ -71,12 +275,22 @@ else
         column-gap: 1.5rem;
         padding: 1.5rem;
     }
+
+    .modal-container {
+        max-width: 90vw;
+        max-height: 90vh;
+    }
 }
 
 @@media (min-width: 768px) {
     .masonry-container {
         column-count: 3;
         column-gap: 1.5rem;
+    }
+
+    .modal-container {
+        max-width: 85vw;
+        max-height: 85vh;
     }
 }
 
@@ -85,6 +299,11 @@ else
         column-count: 4;
         column-gap: 2rem;
         padding: 2rem;
+    }
+
+    .modal-container {
+        max-width: 80vw;
+        max-height: 80vh;
     }
 }
 
@@ -102,10 +321,19 @@ else
         padding: 3rem;
     }
 }
+
+/* Keyboard accessibility */
+.modal-backdrop:focus-within .modal-close {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
 </style>
 
 @code {
     private List<string?> _imagePaths = [];
+    private bool _isModalOpen;
+    private string? _selectedImage;
+    private bool _imageLoaded;
 
     protected override void OnInitialized()
     {
@@ -123,5 +351,21 @@ else
                     f.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)))
                 .ToList();
         }
+    }
+
+    private void OpenModal(string? fileName)
+    {
+        _selectedImage = fileName;
+        _isModalOpen = true;
+        _imageLoaded = false;
+        StateHasChanged();
+    }
+
+    private void CloseModal()
+    {
+        _isModalOpen = false;
+        _selectedImage = null;
+        _imageLoaded = false;
+        StateHasChanged();
     }
 }
