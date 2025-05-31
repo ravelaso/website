@@ -16,3 +16,15 @@
 </body>
 
 </html>
+<script>
+  window.setupBlazorErrorUI = function (dotNetHelper) {
+    window.addEventListener('error', () => {
+      dotNetHelper.invokeMethodAsync('ShowBlazorError');
+    });
+
+    window.addEventListener('unhandledrejection', () => {
+      dotNetHelper.invokeMethodAsync('ShowBlazorError');
+    });
+  };
+</script>
+

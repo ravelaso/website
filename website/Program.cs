@@ -1,10 +1,24 @@
 using website.Components;
 using website.Extensions;
+using Serilog;
 
 // Load environment variables from .env file
 DotNetEnv.Env.Load();
 
+
+// Set up Serilog logger
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(outputTemplate:
+        "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .Enrich.FromLogContext()
+    .MinimumLevel.Information() // Adjust as needed
+    .CreateLogger();
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Use Serilog
+builder.Host.UseSerilog();
 
 // Add environment variables to configuration
 builder.Configuration.AddEnvironmentVariables();
@@ -28,6 +42,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 // Map endpoints
+app.UseStaticFiles();
 app.MapAuthenticationEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

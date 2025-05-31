@@ -2,8 +2,29 @@
 
 @Body
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+@if (_showBlazorError)
+{
+    <div id="blazor-error-ui" data-nosnippet>
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss" @onclick="() => _showBlazorError = false">🗙</span>
+    </div>
+}
+
+@code {
+    private bool _showBlazorError;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Js.InvokeVoidAsync("setupBlazorErrorUI", DotNetObjectReference.Create(this));
+        }
+    }
+
+    [JSInvokable]
+    public void ShowBlazorError() => _showBlazorError = true;
+
+    [Inject]
+    IJSRuntime Js { get; set; } = null!;
+}
