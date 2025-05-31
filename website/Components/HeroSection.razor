@@ -61,6 +61,7 @@
 
 </section>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // 🎛️ PHYSICS CONFIGURATION - Tweak these values!
@@ -88,11 +89,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Performance
         TARGET_FPS: 60,                // Animation frame rate
-        BOUNDARY_MARGIN: 5             // Distance from edges before boundary push
+        BOUNDARY_MARGIN: 5,             // Distance from edges before boundary push
+
+        // 📱 RESPONSIVE ICON COUNTS
+        ICON_COUNT: {
+            mobile: 8,      // 📱 Phone: Just a few for performance
+            tablet: 15,     // 📱 Tablet: Medium amount
+            desktop: 35,    // 💻 Desktop: Full experience
+            large: 50       // 🖥️ Large screens: Maximum beauty
+        }
     };
 
+    // 📏 Detect device type based on screen size
+    function getDeviceType() {
+        const width = window.innerWidth;
+        if (width < 640) return 'mobile';        // sm breakpoint
+        if (width < 1024) return 'tablet';       // lg breakpoint
+        if (width < 1440) return 'desktop';      // xl breakpoint
+        return 'large';                          // 2xl+
+    }
+
+    // 🎯 Get icon count for current device
+    function getIconCount() {
+        const deviceType = getDeviceType();
+        return CONFIG.ICON_COUNT[deviceType];
+    }
+
     const heroSection = document.getElementById('hero-section');
-    const floatingElements = document.querySelectorAll('.floating-element');
+    let floatingElements = document.querySelectorAll('.floating-element');
+
+    // 📱 Adjust icon count based on screen size
+    const targetIconCount = getIconCount();
+    const currentIconCount = floatingElements.length;
+
+    console.log(`🎯 Device: ${getDeviceType()}, Target icons: ${targetIconCount}, Current: ${currentIconCount}`);
+
+    // Hide excess icons if we have too many for this device
+    if (currentIconCount > targetIconCount) {
+        Array.from(floatingElements).forEach((element, index) => {
+            if (index >= targetIconCount) {
+                element.style.display = 'none';
+            }
+        });
+        // Update the NodeList to only include visible elements
+        floatingElements = Array.from(document.querySelectorAll('.floating-element')).filter(el => el.style.display !== 'none');
+    }
 
     // Performance optimization: cache elements data
     const elementsData = Array.from(floatingElements).map((element, index) => ({
@@ -110,6 +151,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let animationId;
     let lastTime = 0;
     const frameTime = 1000 / CONFIG.TARGET_FPS;
+
+    // 📱 Adjust physics based on device (lighter physics for mobile)
+    const deviceType = getDeviceType();
+    if (deviceType === 'mobile') {
+        CONFIG.INITIAL_VELOCITY *= 0.5;  // Slower on mobile
+        CONFIG.MAX_SPEED *= 0.5;         // Less chaos
+        CONFIG.MOUSE_REPEL_FORCE *= 0.5; // Gentler interactions
+        CONFIG.TARGET_FPS = 30;          // Better performance
+    }
 
     // High-performance animation loop
     function animate(currentTime) {
@@ -248,6 +298,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // 📱 Handle screen resize - adjust icon count if needed
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const newIconCount = getIconCount();
+            const currentVisible = elementsData.length;
+
+            if (newIconCount !== currentVisible) {
+                console.log(`🔄 Screen resized: adjusting icons from ${currentVisible} to ${newIconCount}`);
+                // Reload page for simplicity (or implement dynamic show/hide)
+                location.reload();
+            }
+        }, 250);
+    });
+
     // Start the animation loop
     animate(0);
 
@@ -268,15 +334,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 @code {
-    private int ElementCount = 50;
-    private List<FloatingElement> FloatingElements = new();
 
-    private int GetIconCountForDevice()
-    {
-        // We'll determine this via JavaScript since we can't detect screen size server-side
-        // Default to mobile-friendly count for SSR, then JS will adjust
-        return 8; // Safe default
-    }
+    private List<FloatingElement> FloatingElements = new();
 
     protected override void OnInitialized()
     {
@@ -291,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var opacities = new[] { "opacity-20" };
         var colors = new[] { "text-gray-300" };
 
-        for (int i = 0; i < ElementCount; i++)
+        for (int i = 0; i < 50; i++) // Keep this at 50 (max for large screens)
         {
             FloatingElements.Add(new FloatingElement
             {
@@ -301,29 +360,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 SizeClass = sizes[random.Next(sizes.Length)],
                 OpacityClass = opacities[random.Next(opacities.Length)],
                 ColorClass = colors[random.Next(colors.Length)],
-                AnimationIndex = 0, // Disabled - handled by JS
-                Duration = 0, // Disabled
+                AnimationIndex = 0,
+                Duration = 0,
                 DurationUnit = "s"
             });
         }
     }
 
 
-private List<string> GetSvgIcons()
-{
-    return new List<string>
+
+    private List<string> GetSvgIcons()
     {
-        // 🎵 Music Icons
+        return new List<string>
+        {
+            // 🎵 Music Icons
 
-        """<ellipse cx="7" cy="17" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M9 17V6l7-2v11"/><ellipse cx="14" cy="15" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/>""", // Double notes with stems
+            """<ellipse cx="7" cy="17" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M9 17V6l7-2v11"/><ellipse cx="14" cy="15" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/>""", // Double notes with stems
 
-        // 📷 Camera Icons
-        """<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M14.5 4h-5L7 6H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3l-2.5-2z"/><circle cx="12" cy="13" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>""", // Perfect camera
+            // 📷 Camera Icons
+            """<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M14.5 4h-5L7 6H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3l-2.5-2z"/><circle cx="12" cy="13" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>""", // Perfect camera
 
-        """<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="16" cy="8" r="1" fill="currentColor"/>""", // Camera lens
+            """<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="16" cy="8" r="1" fill="currentColor"/>""", // Camera lens
 
-    };
-}
+        };
+    }
 
 
     public class FloatingElement
@@ -337,7 +397,8 @@ private List<string> GetSvgIcons()
         public int AnimationIndex { get; set; }
         public int Duration { get; set; }
         public string DurationUnit { get; set; } = "s";
-        public string AnimationString => ""; // No CSS animation
+        public string AnimationString => "";
     }
+
 
 }
