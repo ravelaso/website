@@ -225,27 +225,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     private List<string> GetSvgIcons()
+{
+    return new List<string>
     {
-        return new List<string>
-        {
-            // Code Icons
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01""/>",
+        // Music Icons
+        """<path d="M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z"/>""",
 
-            // Music Icons
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z""/>",
+        // Code Icons
+        """<path d="M4.708 5.578L2.061 8.224l2.647 2.646-.708.708-3-3V7.87l3-3 .708.708zm7-.708L11 5.578l2.647 2.646L11 10.87l.708.708 3-3V7.87l-3-3zM4.908 13l.894.448 5-10L9.908 3l-5 10z"/>""",
 
-            // Camera Icons
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z""/><path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M15 13a3 3 0 11-6 0 3 3 0 016 0z""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z""/>",
-            @"<path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z""/><path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""1.5"" d=""M15 11a3 3 0 11-6 0 3 3 0 016 0z""/>"
-        };
-    }
+        // Camera Icons
+        """<path fill="#444" d="M11 9c0 1.657-1.343 3-3 3s-3-1.343-3-3c0-1.657 1.343-3 3-3s3 1.343 3 3z"></path><path fill="#444" d="M11 4v-3h-6v3h-5v9h5c0.8 0.6 1.9 1 3 1s2.2-0.4 3-1h5v-9h-5zM6 2h4v2h-4v-2zM8 13c-2.2 0-4-1.8-4-4s1.8-4 4-4c2.2 0 4 1.8 4 4s-1.8 4-4 4zM15 6h-2v-1h2v1z"></path> """,
+
+    };
+}
+
 
     public class FloatingElement
     {
