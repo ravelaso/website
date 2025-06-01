@@ -17,6 +17,10 @@ public class AuthorizationService
         return !string.IsNullOrEmpty(username) && _allowedUsers.Contains(username);
     }
 
+    public string? GetAvatar(ClaimsPrincipal user)
+    {
+        return user.FindFirst("avatar_url")?.Value;
+    }
     public string? GetUserName(ClaimsPrincipal user)
     {
         return user.FindFirst("name")?.Value ?? user.FindFirst("login")?.Value;

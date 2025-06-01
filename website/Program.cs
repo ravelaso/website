@@ -12,7 +12,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(outputTemplate:
         "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
     .Enrich.FromLogContext()
-    .MinimumLevel.Information() // Adjust as needed
+    .MinimumLevel.Information()// Adjust as needed
     .CreateLogger();
 
 
@@ -27,7 +27,7 @@ builder.Configuration.AddEnvironmentVariables();
 // Add services to the container
 builder.Services.AddApplicationServices();
 builder.Services.AddGitHubAuthentication(builder.Configuration);
-builder.Services.AddScoped<ImageService>();
+
 
 var app = builder.Build();
 

@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
             .AddInteractiveServerComponents();
 
         services.AddScoped<AuthorizationService>();
+        services.AddScoped<ImageService>();
 
         return services;
     }
