@@ -6,3 +6,4 @@ riderModule.iml
 .idea
 .env
 node_modules
+/website/wwwroot/images/thumbs/
