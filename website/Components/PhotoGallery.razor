@@ -1,19 +1,19 @@
-@inject IWebHostEnvironment Env
+@using website.Services
+@inject ImageService ImageService
 
-@if (!_imagePaths.Any())
+@if (!_images.Any())
 {
     <p>No images found in the gallery.</p>
 }
 else
 {
     <div class="masonry-container">
-        @foreach (var path in _imagePaths)
+        @foreach (var image in _images)
         {
-            var fileName = Path.GetFileName(path);
             <div class="masonry-item">
-                <div class="image-wrapper" @onclick="() => OpenModal(fileName)">
+                <div class="image-wrapper" @onclick="() => OpenModal(image.FileName)">
                     <img
-                        src="@($"/images/thumbs/{fileName}")"
+                        src="@($"/images/thumbs/{image.FileName}")"
                         alt="Gallery Image"
                         loading="lazy"
                         class="masonry-image"
@@ -28,19 +28,17 @@ else
         }
     </div>
 
-    <!-- 🖼️ MODAL WINDOW -->
+    <!-- Modal (same as before) -->
     @if (_isModalOpen && !string.IsNullOrEmpty(_selectedImage))
     {
         <div class="modal-backdrop" @onclick="CloseModal">
             <div class="modal-container" @onclick:stopPropagation="true">
-                <!-- Close Button -->
                 <button class="modal-close" @onclick="CloseModal" aria-label="Close">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
 
-                <!-- Image -->
                 <div class="modal-image-wrapper">
                     <img
                         src="@($"/images/gallery/{_selectedImage}")"
@@ -49,19 +47,12 @@ else
                         @onload="() => _imageLoaded = true"
                     />
 
-                    <!-- Loading spinner -->
                     @if (!_imageLoaded)
                     {
                         <div class="modal-loading">
                             <div class="loading-spinner"></div>
                         </div>
                     }
-                </div>
-
-                <!-- Image Info -->
-                <div class="modal-info">
-                    <h3 class="modal-title">@Path.GetFileNameWithoutExtension(_selectedImage)</h3>
-                    <p class="modal-subtitle">Click outside to close</p>
                 </div>
             </div>
         </div>
@@ -330,30 +321,17 @@ else
 </style>
 
 @code {
-    private List<string?> _imagePaths = [];
+    private List<ImageInfo> _images = [];
     private bool _isModalOpen;
     private string? _selectedImage;
     private bool _imageLoaded;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var galleryPath = Path.Combine(Env.WebRootPath, "images/gallery");
-
-        if (Directory.Exists(galleryPath))
-        {
-            _imagePaths = Directory
-                .EnumerateFiles(galleryPath)
-                .Select(Path.GetFileName)
-                .Where(f => f != null && (
-                    f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                    f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                    f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                    f.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)))
-                .ToList();
-        }
+        _images = await ImageService.GetAllImagesAsync();
     }
 
-    private void OpenModal(string? fileName)
+    private void OpenModal(string fileName)
     {
         _selectedImage = fileName;
         _isModalOpen = true;
@@ -366,6 +344,12 @@ else
         _isModalOpen = false;
         _selectedImage = null;
         _imageLoaded = false;
+        StateHasChanged();
+    }
+
+    public async Task RefreshImages()
+    {
+        _images = await ImageService.GetAllImagesAsync();
         StateHasChanged();
     }
 }

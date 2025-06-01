@@ -1,15 +1,83 @@
+
 @page "/dashboard/images"
+@using Microsoft.AspNetCore.Components.Forms
+@using website.Services
 @layout Layout.DashboardLayout
+@inject ImageService ImageService
+@rendermode InteractiveServer
 
 <PageTitle>Image Gallery - Dashboard</PageTitle>
 
-<div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
-    <h2 class="text-xl font-semibold text-white mb-4">Image Gallery Management</h2>
-    <p class="text-gray-300 mb-6">This will be the image upload and gallery management section.</p>
+<div class="space-y-6">
+    <div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
+        <h2 class="text-xl font-semibold text-white">Image Gallery Management</h2>
+        <p class="text-gray-300">Upload and manage your image gallery</p>
+    </div>
 
-    <!-- Placeholder content -->
-    <div class="bg-gray-950 border border-gray-800 rounded-lg p-8 text-center">
-        <p class="text-gray-400 text-lg">Image upload form coming next...</p>
-        <p class="text-gray-500 text-sm mt-2">Upload images to /images/gallery/ and generate thumbnails</p>
+    <div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
+        <h3 class="text-lg font-medium text-white mb-4">Upload Images</h3>
+
+        <div class="border-2 border-dashed border-gray-700 rounded-lg p-6">
+            <InputFile OnChange="HandleFileSelection"
+                       multiple
+                       accept="image/*"
+                       class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+        </div>
+
+        @if (_selectedFiles.Any())
+        {
+            <div class="mt-4 bg-gray-950 border border-gray-800 rounded-lg p-4">
+                <h4 class="text-white font-medium mb-3">Selected Files (@_selectedFiles.Count)</h4>
+                @foreach (var file in _selectedFiles)
+                {
+                    <div class="bg-gray-800 rounded px-3 py-2 mb-2">
+                        <span class="text-gray-300 text-sm">@file.Name</span>
+                        <span class="text-gray-500 text-xs ml-2">(@(file.Size) bytes)</span>
+                    </div>
+                }
+
+                <div class="mt-4">
+                    <button @onclick="UploadFiles" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
+                        Upload Files
+                    </button>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(_message))
+        {
+            <div class="mt-4 p-3 rounded bg-green-900 text-green-300">
+                @_message
+            </div>
+        }
     </div>
 </div>
+
+@code {
+    private List<IBrowserFile> _selectedFiles = new();
+    private string _message = string.Empty;
+
+    private void HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        _selectedFiles = e.GetMultipleFiles(10).ToList();
+        _message = string.Empty;
+    }
+
+    private async Task UploadFiles()
+    {
+        try
+        {
+            foreach (var file in _selectedFiles)
+            {
+                await ImageService.UploadImageAsync(file);
+            }
+
+            _message = "Files uploaded successfully!";
+            _selectedFiles.Clear();
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error: {ex.Message}";
+        }
+    }
+}

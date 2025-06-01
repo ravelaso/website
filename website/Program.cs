@@ -27,6 +27,7 @@ builder.Configuration.AddEnvironmentVariables();
 // Add services to the container
 builder.Services.AddApplicationServices();
 builder.Services.AddGitHubAuthentication(builder.Configuration);
+builder.Services.AddScoped<ImageService>();
 
 var app = builder.Build();
 
@@ -48,6 +49,7 @@ app.MapAuthenticationEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 
 ThumbnailGenerator.GenerateThumbnails(
     "wwwroot/images/gallery/",
