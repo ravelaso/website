@@ -1,12 +1,12 @@
-﻿version: '3.8'
-
-services:
-  website:
-    image: ravelaso/website:latest
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./content/images:/app/wwwroot/images
-      - ./content/data:/app/wwwroot/data
-    environment:
-      - DOTNET_ENVIRONMENT=Development
+﻿#version: '3.8'
+#
+#services:
+#  website:
+#    image: ravelaso/website:latest
+#    ports:
+#      - "8080:8080"
+#    volumes:
+#      - ./content/images:/app/wwwroot/images
+#      - ./content/data:/app/wwwroot/data
+#    environment:
+#      - DOTNET_ENVIRONMENT=Development

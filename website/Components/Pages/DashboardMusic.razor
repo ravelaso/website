@@ -1,14 +1,181 @@
 @page "/dashboard/music"
+@using website.Models
+@using website.Services
 @layout Layout.DashboardLayout
+@inject DataService DataService
+@rendermode InteractiveServer
 
 <PageTitle>Music Management - Dashboard</PageTitle>
 
-<div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
-    <h2 class="text-xl font-semibold text-white mb-4">Music Management</h2>
-    <p class="text-gray-300 mb-6">This will be the music management section.</p>
+<div class="bg-neutral-950 rounded-xl border border-neutral-800 p-6">
+    <h2 class="text-2xl font-bold text-white mb-4">🎵 Music Projects</h2>
+    <p class="text-neutral-400 mb-6">Add and manage your music projects below.</p>
 
-    <div class="bg-gray-950 border border-gray-800 rounded-lg p-8 text-center">
-        <p class="text-gray-400 text-lg">Music management features coming soon...</p>
-        <p class="text-gray-500 text-sm mt-2">Upload songs, manage playlists, organize music library</p>
+    <!-- Add Project Form -->
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6 mb-10">
+        <h3 class="text-white font-semibold text-lg mb-4">Add New Project</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input @bind="_newProject.Title" placeholder="Project Title"
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+
+            <input @bind="_newProject.Link" placeholder="Link (optional)"
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+
+            <textarea @bind="_newProject.Description" placeholder="Description"
+                      class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500"></textarea>
+
+            <input @bind="_newTags" placeholder="Tags (comma separated)"
+                   class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+        </div>
+
+        <button @onclick="AddProject"
+                class="mt-5 bg-white text-black hover:bg-neutral-200 font-medium px-5 py-2 rounded-md transition">
+            ➕ Add Project
+        </button>
     </div>
+
+    <!-- Project List -->
+    @if (_musicProjects.Count == 0)
+    {
+        <p class="text-neutral-500">No projects added yet.</p>
+    }
+    else
+    {
+        <div class="grid md:grid-cols-2 gap-6">
+            @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
+            {
+                <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-white font-semibold text-xl mb-1">@project.Title</h4>
+                            <p class="text-neutral-500 text-sm">📅 @project.Date.ToString("yyyy-MM-dd")</p>
+                        </div>
+                        <button @onclick="() => PromptDelete(project)"
+                                class="text-neutral-400 hover:text-red-500 text-sm mt-1 transition">
+                            🗑 Delete
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(project.Description))
+                    {
+                        <p class="text-neutral-300 mb-3">@project.Description</p>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(project.Link))
+                    {
+                        <a href="@project.Link" target="_blank"
+                           class="text-blue-400 hover:text-blue-300 hover:underline mb-3 inline-block transition">
+                            🔗 Visit Link
+                        </a>
+                    }
+
+                    @if (project.Tags.Any())
+                    {
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            @foreach (var tag in project.Tags)
+                            {
+                                <span class="bg-neutral-800 text-sm text-neutral-300 px-3 py-1 rounded-full">
+                                    #@tag
+                                </span>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
 </div>
+
+@if (_showConfirmModal && _projectToDelete is not null)
+{
+    <div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-md shadow-xl">
+            <h3 class="text-white text-lg font-semibold mb-4">Confirm Deletion</h3>
+            <p class="text-neutral-300 mb-6">
+                Are you sure you want to delete <strong>@_projectToDelete.Title</strong>?
+            </p>
+
+            <div class="flex justify-end space-x-3">
+                <button @onclick="CancelDelete"
+                        class="px-4 py-2 bg-neutral-700 text-neutral-300 rounded-md hover:bg-neutral-600 transition">
+                    Cancel
+                </button>
+                <button @onclick="ConfirmDelete"
+                        class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private List<MusicProject> _musicProjects = [];
+    private MusicProject _newProject = new();
+    private string _newTags = string.Empty;
+    private bool _showConfirmModal;
+    private MusicProject? _projectToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var musicData = await DataService.LoadDataAsync<MusicData>("Music.json");
+            _musicProjects = musicData?.Projects ?? [];
+        }
+        catch
+        {
+            _musicProjects = [];
+        }
+    }
+
+    private async Task AddProject()
+    {
+        if (!string.IsNullOrWhiteSpace(_newProject.Title))
+        {
+            _newProject.Id = Guid.NewGuid().ToString();
+            _newProject.Date = DateTime.Now;
+            _newProject.Tags = _newTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+            _musicProjects.Add(_newProject);
+
+            await SaveData();
+
+            // Reset form
+            _newProject = new MusicProject();
+            _newTags = string.Empty;
+        }
+    }
+
+    private void PromptDelete(MusicProject project)
+    {
+        _projectToDelete = project;
+        _showConfirmModal = true;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (_projectToDelete is not null)
+        {
+            _musicProjects.Remove(_projectToDelete);
+            await SaveData();
+        }
+
+        _projectToDelete = null;
+        _showConfirmModal = false;
+    }
+
+    private void CancelDelete()
+    {
+        _projectToDelete = null;
+        _showConfirmModal = false;
+    }
+
+    private async Task SaveData()
+    {
+        var musicData = new MusicData { Projects = _musicProjects };
+        await DataService.SaveDataAsync("Music.json", musicData);
+    }
+}

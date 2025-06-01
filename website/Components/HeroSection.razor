@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Performance optimization: cache elements data
-    const elementsData = Array.from(floatingElements).map((element, index) => ({
+    const elementsdata = Array.from(floatingElements).map((element, index) => ({
         element,
         id: index,
         x: parseFloat(element.style.left),
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePositions() {
-        elementsData.forEach(data => {
+        elementsdata.forEach(data => {
             // Gentle gravity towards original position
             const dx = data.originalX - data.x;
             const dy = data.originalY - data.y;
@@ -209,10 +209,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function checkCollisions() {
-        for (let i = 0; i < elementsData.length; i++) {
-            for (let j = i + 1; j < elementsData.length; j++) {
-                const a = elementsData[i];
-                const b = elementsData[j];
+        for (let i = 0; i < elementsdata.length; i++) {
+            for (let j = i + 1; j < elementsdata.length; j++) {
+                const a = elementsdata[i];
+                const b = elementsdata[j];
 
                 const dx = a.x - b.x;
                 const dy = a.y - b.y;
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateMouseEffects() {
         if (!isMouseMoving) return;
 
-        elementsData.forEach(data => {
+        elementsdata.forEach(data => {
             const dx = mouseX - data.x;
             const dy = mouseY - data.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     heroSection.addEventListener('mouseleave', function() {
-        elementsData.forEach(data => {
+        elementsdata.forEach(data => {
             data.element.style.filter = '';
             data.element.style.transform = '';
             data.element.style.transition = 'filter 0.2s ease-out, transform 0.2s ease-out';
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             const newIconCount = getIconCount();
-            const currentVisible = elementsData.length;
+            const currentVisible = elementsdata.length;
 
             if (newIconCount !== currentVisible) {
                 console.log(`🔄 Screen resized: adjusting icons from ${currentVisible} to ${newIconCount}`);
