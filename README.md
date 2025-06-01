@@ -1,9 +1,9 @@
 
 Tailwind
 
-``sh
+```sh
 npx tailwindcss -i ./Styles/input.css -o ./wwwroot/tailwind.css --watch
-``
+```
 
 
 prepare-folders.sh
