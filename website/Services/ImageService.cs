@@ -67,7 +67,7 @@ public class ImageService
             // Save original image
             await using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                await file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(stream); // 10MB limit
+                await file.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024).CopyToAsync(stream); // 100MB limit
             }
 
             // Generate thumbnail

@@ -6,6 +6,8 @@
 @rendermode InteractiveServer
 
 <PageTitle>Image Gallery - Dashboard</PageTitle>
+
+
 <div class="space-y-6">
     <!-- Header -->
     <div class="bg-neutral-950 rounded-lg border border-neutral-800 p-6">
@@ -29,34 +31,26 @@
                               hover:file:bg-neutral-800" />
         </div>
 
-        @if (_uploadQueue.Any())
+        @if (_selectedFiles.Any())
         {
             <div class="mt-4 bg-neutral-900 border border-neutral-800 rounded-lg p-4">
-                <h4 class="text-white font-medium mb-3">Selected Files (@_uploadQueue.Count)</h4>
-
-                @foreach (var item in _uploadQueue)
+                <h4 class="text-white font-medium mb-3">Selected Files (@_selectedFiles.Count)</h4>
+                @foreach (var file in _selectedFiles)
                 {
-                    <div class="bg-neutral-800 rounded px-3 py-2 mb-2 flex justify-between items-center">
-                        <div>
-                            <span class="text-neutral-200 text-sm">@item.File.Name</span>
-                            <span class="text-neutral-500 text-xs ml-2">(@item.File.Size bytes)</span>
-                        </div>
-                        <span class="text-xs @(item.Status.Contains("Failed") ? "text-red-400" : item.Status.Contains("Uploaded") ? "text-green-400" : "text-neutral-400")">
-                            @item.Status
-                        </span>
+                    <div class="bg-neutral-800 rounded px-3 py-2 mb-2">
+                        <span class="text-neutral-200 text-sm">@file.Name</span>
+                        <span class="text-neutral-500 text-xs ml-2">(@(file.Size) bytes)</span>
                     </div>
                 }
 
                 <div class="mt-4">
                     <button @onclick="UploadFiles"
-                            disabled="@(!_uploadQueue.Any())"
                             class="bg-white text-black px-4 py-2 rounded text-sm hover:bg-neutral-200 transition">
                         Upload Files
                     </button>
                 </div>
             </div>
         }
-
 
         @if (!string.IsNullOrEmpty(_message))
         {
@@ -127,13 +121,11 @@
     </div>
 </div>
 
+
 @code {
     private List<IBrowserFile> _selectedFiles = new();
     private List<ImageInfo> _existingImages = new();
     private string _message = string.Empty;
-    private const long MaxFileSize = 50 * 1024 * 1024; // 50 MB
-    private record UploadItem(IBrowserFile File, string Status);
-    private List<UploadItem> _uploadQueue = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,76 +134,34 @@
 
     private void HandleFileSelection(InputFileChangeEventArgs e)
     {
-        try
-        {
-            var files = e.GetMultipleFiles(50).ToList();
-            var oversizedFiles = new List<string>();
-
-            _uploadQueue.Clear();
-
-            foreach (var file in files)
-            {
-                if (file.Size <= MaxFileSize)
-                    _uploadQueue.Add(new UploadItem(file, "Pending"));
-                else
-                    oversizedFiles.Add(file.Name);
-            }
-
-            _message = oversizedFiles.Count > 0
-                ? $"These files exceed 50 MB and won't be uploaded: {string.Join(", ", oversizedFiles)}"
-                : string.Empty;
-        }
-        catch
-        {
-            _uploadQueue.Clear();
-            _message = "You can upload a maximum of 50 files at once.";
-        }
+        _selectedFiles = e.GetMultipleFiles(50).ToList();
+        _message = string.Empty;
     }
+
     private async Task UploadFiles()
     {
-        if (!_uploadQueue.Any())
+        try
         {
-            _message = "No valid files selected to upload.";
-            return;
-        }
-
-        foreach (var (file, _) in _uploadQueue)
-        {
-            var item = _uploadQueue.First(f => f.File == file);
-            var index = _uploadQueue.IndexOf(item);
-
-            if (file.Size == 0)
-            {
-                _uploadQueue[index] = item with { Status = "Skipped (0 B)" };
-                StateHasChanged();
-                continue;
-            }
-
-            _uploadQueue[index] = item with { Status = "Uploading..." };
-            StateHasChanged();
-
-            try
+            foreach (var file in _selectedFiles)
             {
                 await ImageService.UploadImageAsync(file);
-                _uploadQueue[index] = item with { Status = "Uploaded ✅" };
-            }
-            catch (Exception ex)
-            {
-                _uploadQueue[index] = item with { Status = $"Failed ❌ ({ex.Message})" };
             }
 
-            StateHasChanged();
-            await Task.Delay(100); // Optional: smooth UI update
+            _message = "Files uploaded successfully!";
+            _selectedFiles.Clear();
+
+            // Refresh gallery to show new images
+            await RefreshGallery();
         }
-
-        _message = "Upload process complete.";
-        await RefreshGallery();
+        catch (Exception ex)
+        {
+            _message = $"Error: {ex.Message}";
+        }
     }
 
     private async Task RefreshGallery()
     {
         _existingImages = await ImageService.GetAllImagesAsync();
-        await ImageService.GenerateAllThumbnailsAsync();
         StateHasChanged();
     }
 
