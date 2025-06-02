@@ -1,4 +1,5 @@
 @page "/dashboard/images"
+@using System.Net.Mime
 @using Microsoft.AspNetCore.Components.Forms
 @using website.Services
 @layout Layout.DashboardLayout
@@ -31,24 +32,40 @@
                               hover:file:bg-neutral-800" />
         </div>
 
-        @if (_selectedFiles.Any())
+        @if (_uploadQueue.Any())
         {
-            <div class="mt-4 bg-neutral-900 border border-neutral-800 rounded-lg p-4">
-                <h4 class="text-white font-medium mb-3">Selected Files (@_selectedFiles.Count)</h4>
-                @foreach (var file in _selectedFiles)
-                {
-                    <div class="bg-neutral-800 rounded px-3 py-2 mb-2">
-                        <span class="text-neutral-200 text-sm">@file.Name</span>
-                        <span class="text-neutral-500 text-xs ml-2">(@(file.Size) bytes)</span>
+            @foreach (var entry in _uploadQueue)
+            {
+                <div class="bg-neutral-800 rounded px-3 py-2 mb-2 flex justify-between items-center">
+                    <div>
+                        <span class="text-neutral-200 text-sm">@entry.File.Name</span>
+                        <span class="text-neutral-500 text-xs ml-2">(@(entry.File.Size) bytes)</span>
                     </div>
-                }
-
-                <div class="mt-4">
-                    <button @onclick="UploadFiles"
-                            class="bg-white text-black px-4 py-2 rounded text-sm hover:bg-neutral-200 transition">
-                        Upload Files
-                    </button>
+                    <div>
+                        @switch (entry.Status)
+                        {
+                            case "Uploading":
+                                <span class="text-yellow-400 text-xs animate-pulse">Uploading...</span>
+                                break;
+                            case "Success":
+                                <span class="text-green-400 text-xs">Uploaded ✅</span>
+                                break;
+                            case "Error":
+                                <span class="text-red-400 text-xs">Failed ❌</span>
+                                break;
+                            default:
+                                <span class="text-neutral-500 text-xs">Waiting...</span>
+                                break;
+                        }
+                    </div>
                 </div>
+            }
+            <div class="mt-4">
+                <button @onclick="UploadFiles"
+                        disabled="@(!_uploadQueue.Any())"
+                        class="bg-white text-black px-4 py-2 rounded text-sm hover:bg-neutral-200 transition">
+                    Upload Files
+                </button>
             </div>
         }
 
@@ -126,6 +143,12 @@
     private List<IBrowserFile> _selectedFiles = new();
     private List<ImageInfo> _existingImages = new();
     private string _message = string.Empty;
+    private List<UploadFileEntry> _uploadQueue = new();
+    private class UploadFileEntry
+    {
+        public IBrowserFile File { get; set; } = default!;
+        public string Status { get; set; } = "Pending"; // Pending, Uploading, Success, Error
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -134,7 +157,9 @@
 
     private void HandleFileSelection(InputFileChangeEventArgs e)
     {
-        _selectedFiles = e.GetMultipleFiles(50).ToList();
+        _uploadQueue = e.GetMultipleFiles(50)
+            .Select(file => new UploadFileEntry { File = file })
+            .ToList();
         _message = string.Empty;
     }
 
@@ -142,15 +167,29 @@
     {
         try
         {
-            foreach (var file in _selectedFiles)
+            var uploadedFiles = new List<string>();
+
+            foreach (var entry in _uploadQueue)
             {
-                await ImageService.UploadImageAsync(file);
+                entry.Status = "Uploading";
+                StateHasChanged(); // refresh UI for this entry
+
+                var success = await ImageService.UploadImageAsync(entry.File);
+
+                entry.Status = success ? "Success" : "Error";
+                StateHasChanged();
+
+                if (success)
+                    uploadedFiles.Add(entry.File.Name);
             }
 
-            _message = "Files uploaded successfully!";
-            _selectedFiles.Clear();
-
-            // Refresh gallery to show new images
+            if (uploadedFiles.Any())
+            {
+                _message = "Files uploaded. Generating thumbnails...";
+                await ImageService.GenerateAllThumbnailsAsync();
+                _message = "All files uploaded and thumbnails generated!";
+            }
+            _uploadQueue.Clear();
             await RefreshGallery();
         }
         catch (Exception ex)
