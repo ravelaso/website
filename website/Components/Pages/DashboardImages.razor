@@ -1,6 +1,4 @@
 @page "/dashboard/images"
-@using System.Net.Mime
-@using Microsoft.AspNetCore.Components.Forms
 @using website.Services
 @layout Layout.DashboardLayout
 @inject ImageService ImageService
@@ -140,13 +138,12 @@
 
 
 @code {
-    private List<IBrowserFile> _selectedFiles = new();
-    private List<ImageInfo> _existingImages = new();
+    private List<ImageInfo> _existingImages = [];
     private string _message = string.Empty;
-    private List<UploadFileEntry> _uploadQueue = new();
+    private List<UploadFileEntry> _uploadQueue = [];
     private class UploadFileEntry
     {
-        public IBrowserFile File { get; set; } = default!;
+        public IBrowserFile File { get; init; } = null!;
         public string Status { get; set; } = "Pending"; // Pending, Uploading, Success, Error
     }
 
