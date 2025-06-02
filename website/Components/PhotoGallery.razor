@@ -3,54 +3,50 @@
 
 @if (!_images.Any())
 {
-    <p>No images found in the gallery.</p>
+    <p class="text-center text-gray-500">No images found in the gallery.</p>
 }
 else
 {
-    <div class="masonry-container">
+    <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 p-5">
         @foreach (var image in _images)
         {
-            <div class="masonry-item">
-                <div class="image-wrapper" @onclick="() => OpenModal(image.FileName)">
-                    <img
-                        src="@($"/images/thumbs/{image.FileName}")"
-                        alt="Gallery Image"
-                        loading="lazy"
-                        class="masonry-image"
-                    />
-                    <div class="image-overlay">
-                        <svg class="zoom-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
-                        </svg>
-                    </div>
+            <div class="mb-4 break-inside-avoid overflow-hidden relative group cursor-pointer transition-transform duration-300 hover:scale-105" @onclick="() => OpenModal(image.FileName)">
+                <img
+                    src="@($"/images/thumbs/{image.FileName}")"
+                    alt="Gallery Image"
+                    loading="lazy"
+                    class="w-full h-auto object-cover  "
+                />
+                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-60 transition-opacity duration-300 flex items-center justify-center">
+                    <svg class="w-12 h-12 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
                 </div>
             </div>
         }
     </div>
 
-    <!-- Modal (same as before) -->
     @if (_isModalOpen && !string.IsNullOrEmpty(_selectedImage))
     {
-        <div class="modal-backdrop" @onclick="CloseModal">
-            <div class="modal-container" @onclick:stopPropagation="true">
-                <button class="modal-close" @onclick="CloseModal" aria-label="Close">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        <div class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" @onclick="CloseModal">
+            <div class="relative max-w-5xl w-full bg-white rounded-xl overflow-hidden shadow-xl animate-fade-in" @onclick:stopPropagation>
+                <button class="absolute top-4 right-4 text-white bg-black bg-opacity-70 hover:bg-red-600 rounded-full w-10 h-10 flex items-center justify-center z-10" @onclick="CloseModal" aria-label="Close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-
-                <div class="modal-image-wrapper">
+                <div class="flex items-center justify-center min-h-[200px]">
                     <img
                         src="@($"/images/gallery/{_selectedImage}")"
                         alt="Full size image"
-                        class="modal-image"
+                        class="max-w-full max-h-[80vh] object-contain rounded-xl"
                         @onload="() => _imageLoaded = true"
                     />
 
                     @if (!_imageLoaded)
                     {
-                        <div class="modal-loading">
-                            <div class="loading-spinner"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 border-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
                         </div>
                     }
                 </div>
@@ -59,269 +55,8 @@ else
     }
 }
 
-<style>
-.masonry-container {
-    column-count: 1;
-    column-gap: 1rem;
-    padding: 1rem;
-}
-
-.masonry-item {
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 1rem;
-    break-inside: avoid;
-    page-break-inside: avoid;
-    overflow: hidden;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-    background: white;
-}
-
-.image-wrapper {
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-    border-radius: 0.75rem;
-}
-
-.image-wrapper:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.masonry-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 0.75rem;
-    transition: transform 0.3s ease;
-}
-
-.image-wrapper:hover .masonry-image {
-    transform: scale(1.05);
-}
-
-.image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 0.75rem;
-}
-
-.image-wrapper:hover .image-overlay {
-    opacity: 1;
-}
-
-.zoom-icon {
-    width: 3rem;
-    height: 3rem;
-    color: white;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-/* 🖼️ MODAL STYLES */
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 1rem;
-    animation: modalFadeIn 0.3s ease-out;
-}
-
-.modal-container {
-    position: relative;
-    max-width: 95vw;
-    max-height: 95vh;
-    background: white;
-    border-radius: 1rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-    animation: modalSlideIn 0.3s ease-out;
-}
-
-.modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 3rem;
-    height: 3rem;
-    background: rgba(0, 0, 0, 0.8);
-    border: none;
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-}
-
-.modal-close:hover {
-    background: rgba(255, 0, 0, 0.8);
-    transform: scale(1.1);
-}
-
-.modal-close svg {
-    width: 1.5rem;
-    height: 1.5rem;
-}
-
-.modal-image-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-}
-
-.modal-image {
-    max-width: 100%;
-    max-height: 80vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border-radius: 1rem 1rem 0 0;
-}
-
-.modal-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.loading-spinner {
-    width: 3rem;
-    height: 3rem;
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left: 4px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-.modal-info {
-    padding: 1.5rem;
-    text-align: center;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-}
-
-.modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0 0 0.5rem 0;
-}
-
-.modal-subtitle {
-    color: #6b7280;
-    margin: 0;
-    font-size: 0.875rem;
-}
-
-/* 🎬 ANIMATIONS */
-@@keyframes modalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(-2rem);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-@@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* 📱 Responsive breakpoints */
-@@media (min-width: 640px) {
-    .masonry-container {
-        column-count: 2;
-        column-gap: 1.5rem;
-        padding: 1.5rem;
-    }
-
-    .modal-container {
-        max-width: 90vw;
-        max-height: 90vh;
-    }
-}
-
-@@media (min-width: 768px) {
-    .masonry-container {
-        column-count: 3;
-        column-gap: 1.5rem;
-    }
-
-    .modal-container {
-        max-width: 85vw;
-        max-height: 85vh;
-    }
-}
-
-@@media (min-width: 1024px) {
-    .masonry-container {
-        column-count: 4;
-        column-gap: 2rem;
-        padding: 2rem;
-    }
-
-    .modal-container {
-        max-width: 80vw;
-        max-height: 80vh;
-    }
-}
-
-@@media (min-width: 1280px) {
-    .masonry-container {
-        column-count: 5;
-        column-gap: 2rem;
-    }
-}
-
-@@media (min-width: 1536px) {
-    .masonry-container {
-        column-count: 6;
-        column-gap: 2.5rem;
-        padding: 3rem;
-    }
-}
-
-/* Keyboard accessibility */
-.modal-backdrop:focus-within .modal-close {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-}
-</style>
-
 @code {
-    private List<ImageInfo> _images = [];
+    private List<ImageInfo> _images = new();
     private bool _isModalOpen;
     private string? _selectedImage;
     private bool _imageLoaded;
