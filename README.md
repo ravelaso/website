@@ -1,3 +1,9 @@
+# Personal Website
+
+Its made with Blazor (.NET) uses OAuth with github to facilitate a backend to publish content like a wordpress.
+
+(Work in progress)
+
 
 Tailwind
 
