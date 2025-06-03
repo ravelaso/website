@@ -1,0 +1,94 @@
+﻿@page "/code"
+@using website.Models
+@using website.Services
+@inject DataService DataService
+@layout Layout.MainLayout
+
+<div class="h-screen flex flex-col">
+    <NavBar />
+    
+    <h3 class="text-center text-4xl font-bold my-4">MUSIC</h3>
+
+    <!-- Desktop Layout -->
+    <div class="hidden md:flex flex-1">
+        <!-- About Section -->
+        <div class="w-1/2 flex items-center p-8">
+            <AboutSection FileName="aboutcode.json"/>
+        </div>
+
+        <!-- Scrollable Projects -->
+        <div class="w-1/2 p-8">
+            <div class="h-[calc(100vh-12rem)] overflow-y-auto pr-4 custom-scrollbar">
+                @if (_softwareProjects.Count == 0)
+                {
+                    <p class="text-neutral-500">No projects yet.</p>
+                }
+                else
+                {
+                    <div class="grid grid-cols-1 gap-6 auto-rows-max">
+                        @foreach (var project in _softwareProjects.OrderByDescending(p => p.Date))
+                        {
+                            <SoftwareCard SoftwareData=project />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="md:hidden px-4 pb-6 space-y-8">
+        <AboutSection FileName="aboutmusic.json"/>
+
+        @if (_softwareProjects.Count == 0)
+        {
+            <p class="text-neutral-500">No projects yet.</p>
+        }
+        else
+        {
+            <div class="space-y-6">
+                @foreach (var project in _softwareProjects.OrderByDescending(p => p.Date))
+                {
+                    <SoftwareCard SoftwareData=project />
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #262626;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #404040;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #525252;
+    }
+</style>
+
+@code {
+    private List<SoftwareProject> _softwareProjects = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var softwareData = await DataService.LoadDataAsync<SoftwareData>("Code.json");
+            _softwareProjects = softwareData?.Projects ?? [];
+        }
+        catch
+        {
+            _softwareProjects = [];
+        }
+    }
+}
