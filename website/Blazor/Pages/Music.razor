@@ -28,7 +28,7 @@
                         @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
                         {
                             <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
-                                // ...existing code for project card content...
+                               <MusicCard MusicData=project />
                             </div>
                         }
                     </div>
