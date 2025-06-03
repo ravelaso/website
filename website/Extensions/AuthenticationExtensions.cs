@@ -46,7 +46,7 @@ public static class AuthenticationExtensions
                                           ?? string.Empty; Console.WriteLine("OAuth:UserInformationEndpoint not configured");
 
 
-        options.Scope.Add("user:email");
+        options.Scope.Add(configuration["OAuth:Scope"] ?? string.Empty);
 
         ConfigureClaimMappings(options);
         ConfigureOAuthEvents(options);
