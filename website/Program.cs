@@ -1,4 +1,4 @@
-using website.Components;
+using website.Blazor;
 using website.Extensions;
 using Serilog;
 using website.Services;

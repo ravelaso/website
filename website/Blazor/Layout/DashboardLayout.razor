@@ -20,6 +20,11 @@
                                     <span>Welcome, @AuthService.GetUserName(context.User)</span>
                                     <img class="w-9 h-9 rounded-full border border-neutral-700 shadow"
                                          src="@AuthService.GetAvatar(context.User)" alt="Avatar" />
+                                    <a href="/auth/logout">
+                                    <span class="w-9 h-9 rounded-full border border-neutral-700 shadow">
+                                    Logout
+                                    </span>
+                                    </a>
                                 </div>
                             </div>
                         </div>

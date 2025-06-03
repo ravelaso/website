@@ -293,18 +293,10 @@
                 });
             }
 
-            let resizeTimeout;
-            function handleResize() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    heroAnimation.init(); // Reinitialize on resize
-                }, 250);
-            }
 
             // Add event listeners
             heroSection.addEventListener('mousemove', handleMouseMove);
             heroSection.addEventListener('mouseleave', handleMouseLeave);
-            window.addEventListener('resize', handleResize);
 
             // Start animation
             animate(0);
@@ -316,7 +308,6 @@
                 elementsData,
                 handleMouseMove,
                 handleMouseLeave,
-                handleResize
             };
 
             console.log('✅ Hero animation initialized successfully!');
@@ -378,14 +369,7 @@
                 // Initialize the animation
                 var result = await JsRuntime.InvokeAsync<bool>("heroAnimation.init");
 
-                if (result)
-                {
-                    Console.WriteLine("✅ Animation started successfully");
-                }
-                else
-                {
-                    Console.WriteLine("❌ Animation failed to start");
-                }
+                Console.WriteLine(result ? "✅ Animation started successfully" : "❌ Animation failed to start");
             }
             catch (Exception ex)
             {
@@ -402,7 +386,7 @@
         var opacities = new[] { "opacity-20" };
         var colors = new[] { "text-gray-300" };
 
-        for (int i = 0; i < 50; i++)
+        for (var i = 0; i < 50; i++)
         {
             _floatingElements.Add(new FloatingElement
             {
@@ -418,9 +402,8 @@
 
     private List<string> GetSvgIcons()
     {
-        return new List<string>
-        {
-            // 🎵 Music Icons
+        return
+        [
             """<ellipse cx="7" cy="17" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M9 17V6l7-2v11"/><ellipse cx="14" cy="15" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/>""",
 
             // 📷 Camera Icons
@@ -431,9 +414,9 @@
             // 💻 Developer Icons
             """<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="m18 16 4-4-4-4M6 8l-4 4 4 4"/>""",
 
-            """<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M2 3h20v14H2z"/><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="m8 21 4-4 4 4"/>""",
+            """<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M2 3h20v14H2z"/><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="m8 21 4-4 4 4"/>"""
 
-        };
+        ];
     }
 
     public async ValueTask DisposeAsync()

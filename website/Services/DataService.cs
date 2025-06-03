@@ -4,12 +4,10 @@ namespace website.Services;
 
 public class DataService
 {
-    private readonly IWebHostEnvironment _env;
     private readonly string _dataPath;
 
     public DataService(IWebHostEnvironment env)
     {
-        _env = env;
         _dataPath = Path.Combine(env.WebRootPath, "data");
         Directory.CreateDirectory(_dataPath);
     }
@@ -20,6 +18,7 @@ public class DataService
 
         if (!File.Exists(filePath))
         {
+            Console.WriteLine("DataService.LoadDataAsync failed: No data file found.");
             return new T();
         }
 
@@ -28,20 +27,30 @@ public class DataService
             var json = await File.ReadAllTextAsync(filePath);
             return JsonSerializer.Deserialize<T>(json) ?? new T();
         }
-        catch
+        catch(Exception e)
         {
+            Console.WriteLine("DataService.LoadDataAsync failed: {0}", e.Message);
             return new T();
         }
     }
 
     public async Task SaveDataAsync<T>(string fileName, T data)
     {
-        var filePath = Path.Combine(_dataPath, fileName);
-        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions
+        try
         {
-            WriteIndented = true
-        });
+            var filePath = Path.Combine(_dataPath, fileName);
+            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
 
-        await File.WriteAllTextAsync(filePath, json);
+            await File.WriteAllTextAsync(filePath, json);
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("DataService.SaveDataAsync failed: {0}", e.Message);
+        }
+
     }
 }
