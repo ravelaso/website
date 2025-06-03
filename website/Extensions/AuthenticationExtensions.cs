@@ -29,15 +29,22 @@ public static class AuthenticationExtensions
     private static void ConfigureGitHubOptions(OAuthOptions options, IConfiguration configuration)
     {
         options.ClientId = configuration["GITHUB_CLIENT_ID"]
-            ?? throw new InvalidOperationException("GITHUB_CLIENT_ID not configured");
+                           ?? string.Empty; Console.WriteLine("GITHUB_CLIENT_ID not configured");
+
         options.ClientSecret = configuration["GITHUB_CLIENT_SECRET"]
-            ?? throw new InvalidOperationException("GITHUB_CLIENT_SECRET not configured");
+                               ?? string.Empty; Console.WriteLine("GITHUB_CLIENT_SECRET not configured");
 
-        options.CallbackPath = new PathString("/auth/github/callback");
+        options.CallbackPath = new PathString(configuration["OAuth:CallbackPath"] ?? string.Empty);
 
-        options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
-        options.TokenEndpoint = "https://github.com/login/oauth/access_token";
-        options.UserInformationEndpoint = "https://api.github.com/user";
+        options.AuthorizationEndpoint = configuration["OAuth:AuthorizationEndpoint"]
+                                        ?? string.Empty; Console.WriteLine("OAuth:AuthorizationEndpoint not configured");
+
+        options.TokenEndpoint = configuration["OAuth:TokenEndpoint"]
+                                ?? string.Empty; Console.WriteLine("OAuth:TokenEndpoint not configured");
+
+        options.UserInformationEndpoint = configuration["OAuth:UserInformationEndpoint"]
+                                          ?? string.Empty; Console.WriteLine("OAuth:UserInformationEndpoint not configured");
+
 
         options.Scope.Add("user:email");
 
