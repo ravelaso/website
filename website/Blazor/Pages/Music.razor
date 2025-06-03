@@ -4,56 +4,59 @@
 @inject DataService DataService
 @layout Layout.MainLayout
 
-<NavBar />
+<div class="h-screen flex flex-col">
+    <NavBar />
+    
+    <h3 class="text-center text-4xl font-bold my-4">MUSIC</h3>
 
-<h3 class="text-center text-4xl font-bold m-4">MUSIC</h3>
-<div class="flex justify-center m-4">
-<!-- Project List -->
-    @if (_musicProjects.Count == 0)
-    {
-        <p class="text-neutral-500">No projects yet.</p>
-    }
-    else
-    {
-        <div class="grid md:grid-cols-2 gap-6">
-            @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
-            {
-                <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h4 class="text-white font-semibold text-xl mb-1">@project.Title</h4>
-                            <p class="text-neutral-500 text-sm">📅 @project.Date.ToString("yyyy-MM-dd")</p>
-                        </div>
-                    </div>
-
-                    @if (!string.IsNullOrWhiteSpace(project.Description))
-                    {
-                        <p class="text-neutral-300 mb-3">@project.Description</p>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(project.Link))
-                    {
-                        <a href="@project.Link" target="_blank"
-                           class="text-blue-400 hover:text-blue-300 hover:underline mb-3 inline-block transition">
-                            🔗 Visit Link
-                        </a>
-                    }
-
-                    @if (project.Tags.Any())
-                    {
-                        <div class="flex flex-wrap gap-2 mt-3">
-                            @foreach (var tag in project.Tags)
-                            {
-                                <span class="bg-neutral-800 text-sm text-neutral-300 px-3 py-1 rounded-full">
-                                    #@tag
-                                </span>
-                            }
-                        </div>
-                    }
-                </div>
-            }
+    <div class="flex-1 flex">
+        <!-- Left Section - About -->
+        <div class="w-1/2 flex items-center p-8">
+            <AboutSection FileName="aboutmusic.json"/>
         </div>
+
+        <!-- Right Section - Scrollable Projects -->
+        <div class="w-1/2 p-8">
+            <div class="h-[calc(100vh-12rem)] overflow-y-auto pr-4 custom-scrollbar">
+                @if (_musicProjects.Count == 0)
+                {
+                    <p class="text-neutral-500">No projects yet.</p>
+                }
+                else
+                {
+                    <div class="grid grid-cols-1 gap-6 auto-rows-max">
+                        @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
+                        {
+                            <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
+                                // ...existing code for project card content...
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
     }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #262626;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #404040;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #525252;
+    }
+</style>
 
 @code {
     private List<MusicProject> _musicProjects = [];
@@ -71,4 +74,3 @@
         }
     }
 }
-</div>
