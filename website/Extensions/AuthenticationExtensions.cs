@@ -67,8 +67,8 @@ public static class AuthenticationExtensions
             OnCreatingTicket = async context =>
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", context.AccessToken);
+                request.Headers.Accept.Add(new ("application/json"));
+                request.Headers.Authorization = new ("Bearer", context.AccessToken);
 
                 var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
                 response.EnsureSuccessStatusCode();
