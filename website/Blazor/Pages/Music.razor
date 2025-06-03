@@ -9,13 +9,14 @@
     
     <h3 class="text-center text-4xl font-bold my-4">MUSIC</h3>
 
-    <div class="flex-1 flex">
-        <!-- Left Section - About -->
+    <!-- Desktop Layout -->
+    <div class="hidden md:flex flex-1">
+        <!-- About Section -->
         <div class="w-1/2 flex items-center p-8">
             <AboutSection FileName="aboutmusic.json"/>
         </div>
 
-        <!-- Right Section - Scrollable Projects -->
+        <!-- Scrollable Projects -->
         <div class="w-1/2 p-8">
             <div class="h-[calc(100vh-12rem)] overflow-y-auto pr-4 custom-scrollbar">
                 @if (_musicProjects.Count == 0)
@@ -27,14 +28,31 @@
                     <div class="grid grid-cols-1 gap-6 auto-rows-max">
                         @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
                         {
-                            <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
-                               <MusicCard MusicData=project />
-                            </div>
+                            <MusicCard MusicData=project />
                         }
                     </div>
                 }
             </div>
         </div>
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="md:hidden px-4 pb-6 space-y-8">
+        <AboutSection FileName="aboutmusic.json"/>
+
+        @if (_musicProjects.Count == 0)
+        {
+            <p class="text-neutral-500">No projects yet.</p>
+        }
+        else
+        {
+            <div class="space-y-6">
+                @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
+                {
+                    <MusicCard MusicData=project />
+                }
+            </div>
+        }
     </div>
 </div>
 

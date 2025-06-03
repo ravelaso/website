@@ -48,51 +48,9 @@
         <div class="grid md:grid-cols-2 gap-6">
             @foreach (var project in _softwareProjects.OrderByDescending(p => p.Date))
             {
-                <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h4 class="text-white font-semibold text-xl mb-1">@project.Title</h4>
-                            <p class="text-neutral-500 text-sm">📅 @project.Date.ToString("yyyy-MM-dd")</p>
-                        </div>
-                        <button @onclick="() => PromptDelete(project)"
-                                class="text-neutral-400 hover:text-red-500 text-sm mt-1 transition">
-                            🗑 Delete
-                        </button>
-                    </div>
-
-                    @if (!string.IsNullOrWhiteSpace(project.Description))
-                    {
-                        <p class="text-neutral-300 mb-3">@project.Description</p>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(project.GitHubLink))
-                    {
-                        <a href="@project.GitHubLink" target="_blank"
-                           class="text-blue-400 hover:text-blue-300 hover:underline mb-3 inline-block transition">
-                            🔗 GitHub Repo
-                        </a>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(project.DemoLink))
-                    {
-                        <a href="@project.DemoLink" target="_blank"
-                           class="text-green-400 hover:text-green-300 hover:underline mb-3 inline-block transition">
-                            🚀 Live Demo
-                        </a>
-                    }
-
-                    @if (project.Technologies.Any())
-                    {
-                        <div class="flex flex-wrap gap-2 mt-3">
-                            @foreach (var tech in project.Technologies)
-                            {
-                                <span class="bg-neutral-800 text-sm text-neutral-300 px-3 py-1 rounded-full">
-                                    #@tech
-                                </span>
-                            }
-                        </div>
-                    }
-                </div>
+                <SoftwareCard SoftwareData="@project"
+                                  IsDeletable="true"
+                                  OnDelete="PromptDelete" />
             }
         </div>
     }

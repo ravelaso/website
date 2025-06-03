@@ -1,0 +1,67 @@
+﻿@using website.Models
+
+<div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
+    <div class="flex justify-between items-start mb-4">
+        <div>
+            <h4 class="text-white font-semibold text-xl mb-1">@SoftwareData.Title</h4>
+            <p class="text-neutral-500 text-sm">
+                📅 @(SoftwareData.Date == default ? "N/A" : SoftwareData.Date.ToString("yyyy-MM-dd"))
+            </p>
+        </div>
+
+        @if (IsDeletable)
+        {
+            <button @onclick="() => OnDelete.InvokeAsync(SoftwareData)"
+                    class="text-neutral-400 hover:text-red-500 text-sm mt-1 transition"
+                    aria-label="Delete software project">
+                🗑 Delete
+            </button>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(SoftwareData.Description))
+    {
+        <p class="text-neutral-300 mb-3">@SoftwareData.Description</p>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(SoftwareData.GitHubLink))
+    {
+        <a href="@SoftwareData.GitHubLink" target="_blank" rel="noopener noreferrer"
+           class="text-blue-400 hover:text-blue-300 hover:underline mb-3 inline-block transition"
+           aria-label="Link to GitHub repository">
+            🔗 GitHub Repo
+        </a>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(SoftwareData.DemoLink))
+    {
+        <a href="@SoftwareData.DemoLink" target="_blank" rel="noopener noreferrer"
+           class="text-green-400 hover:text-green-300 hover:underline mb-3 inline-block transition"
+           aria-label="Link to live demo">
+            🚀 Live Demo
+        </a>
+    }
+
+    @if (SoftwareData.Technologies?.Any() == true)
+    {
+        <div class="flex flex-wrap gap-2 mt-3">
+            @foreach (var tech in SoftwareData.Technologies)
+            {
+                <span class="bg-neutral-800 text-sm text-neutral-300 px-3 py-1 rounded-full">
+                    #@tech
+                </span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public SoftwareProject SoftwareData { get; set; }
+
+    [Parameter]
+    public bool IsDeletable { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<SoftwareProject> OnDelete { get; set; }
+}
