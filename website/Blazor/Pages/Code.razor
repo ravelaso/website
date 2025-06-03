@@ -28,7 +28,7 @@
                     <div class="grid grid-cols-1 gap-6 auto-rows-max">
                         @foreach (var project in _softwareProjects.OrderByDescending(p => p.Date))
                         {
-                            <SoftwareCard SoftwareData=project />
+                            <CodeCard CodeData=project />
                         }
                     </div>
                 }
@@ -49,7 +49,7 @@
             <div class="space-y-6">
                 @foreach (var project in _softwareProjects.OrderByDescending(p => p.Date))
                 {
-                    <SoftwareCard SoftwareData=project />
+                    <CodeCard CodeData=project />
                 }
             </div>
         }
@@ -77,13 +77,13 @@
 </style>
 
 @code {
-    private List<SoftwareProject> _softwareProjects = [];
+    private List<CodeProject> _softwareProjects = [];
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var softwareData = await DataService.LoadDataAsync<SoftwareData>("Code.json");
+            var softwareData = await DataService.LoadDataAsync<CodeData>("Code.json");
             _softwareProjects = softwareData?.Projects ?? [];
         }
         catch

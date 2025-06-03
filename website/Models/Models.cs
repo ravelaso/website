@@ -10,7 +10,7 @@ public class MusicProject
     public DateTime Date { get; set; } = DateTime.Now;
 }
 
-public class SoftwareProject
+public class CodeProject
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Title { get; set; } = string.Empty;
@@ -26,7 +26,7 @@ public class MusicData
     public List<MusicProject> Projects { get; set; } = new();
 }
 
-public class SoftwareData
+public class CodeData
 {
-    public List<SoftwareProject> Projects { get; set; } = new();
+    public List<CodeProject> Projects { get; set; } = new();
 }

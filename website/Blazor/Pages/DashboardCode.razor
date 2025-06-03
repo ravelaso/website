@@ -39,16 +39,16 @@
     </div>
 
     <!-- Project List -->
-    @if (_softwareProjects.Count == 0)
+    @if (_codeProjects.Count == 0)
     {
         <p class="text-neutral-500">No projects added yet.</p>
     }
     else
     {
         <div class="grid md:grid-cols-2 gap-6">
-            @foreach (var project in _softwareProjects.OrderByDescending(p => p.Date))
+            @foreach (var project in _codeProjects.OrderByDescending(p => p.Date))
             {
-                <SoftwareCard SoftwareData="@project"
+                <CodeCard CodeData="@project"
                                   IsDeletable="true"
                                   OnDelete="PromptDelete" />
             }
@@ -80,22 +80,22 @@
 }
 
 @code {
-    private List<SoftwareProject> _softwareProjects = new();
-    private SoftwareProject _newProject = new();
+    private List<CodeProject> _codeProjects = new();
+    private CodeProject _newProject = new();
     private string _newTechnologies = string.Empty;
     private bool _showConfirmModal = false;
-    private SoftwareProject? _projectToDelete;
+    private CodeProject? _projectToDelete;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var softwareData = await DataService.LoadDataAsync<SoftwareData>("Projects.json");
-            _softwareProjects = softwareData?.Projects ?? new List<SoftwareProject>();
+            var softwareData = await DataService.LoadDataAsync<CodeData>("Code.json");
+            _codeProjects = softwareData?.Projects ?? [];
         }
         catch
         {
-            _softwareProjects = new List<SoftwareProject>();
+            _codeProjects = [];
         }
     }
 
@@ -109,17 +109,17 @@
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .ToList();
 
-            _softwareProjects.Add(_newProject);
+            _codeProjects.Add(_newProject);
 
             await SaveData();
 
             // Reset form
-            _newProject = new SoftwareProject();
+            _newProject = new CodeProject();
             _newTechnologies = string.Empty;
         }
     }
 
-    private void PromptDelete(SoftwareProject project)
+    private void PromptDelete(CodeProject project)
     {
         _projectToDelete = project;
         _showConfirmModal = true;
@@ -129,7 +129,7 @@
     {
         if (_projectToDelete is not null)
         {
-            _softwareProjects.Remove(_projectToDelete);
+            _codeProjects.Remove(_projectToDelete);
             await SaveData();
         }
         _projectToDelete = null;
@@ -144,7 +144,7 @@
 
     private async Task SaveData()
     {
-        var softwareData = new SoftwareData { Projects = _softwareProjects };
+        var softwareData = new CodeData { Projects = _codeProjects };
         await DataService.SaveDataAsync("Projects.json", softwareData);
     }
 }
