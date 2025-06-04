@@ -44,12 +44,10 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 // Map endpoints
-app.UseStaticFiles();
 app.MapAuthenticationEndpoints();
-app.MapStaticAssets();
+app.UseStaticFiles();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
 
 ThumbnailGenerator.GenerateThumbnails(
     "wwwroot/images/gallery/",
