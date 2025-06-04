@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -9,19 +8,28 @@ namespace website.Extensions;
 
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection AddGitHubAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddGitHubAuthentication(this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = "GitHub";
-        })
-        .AddCookie()
-        .AddOAuth("GitHub", options =>
-        {
-            ConfigureGitHubOptions(options, configuration);
-        });
+            {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "GitHub";
+            })
+            .AddCookie(options =>
+                {
+                    options.Cookie.HttpOnly = true; // Prevents JavaScript access to the cookie
+                    options.Cookie.SecurePolicy =
+                        CookieSecurePolicy.Always; // Ensures the cookie is sent only over HTTPS
+                    options.Cookie.SameSite = SameSiteMode.Strict; // Mitigates CSRF attacks
+                    options.LoginPath = "/auth/login"; // Redirect to login page
+                    options.LogoutPath = "/auth/logout"; // Redirect to logout page
+                    options.ExpireTimeSpan = TimeSpan.FromHours(1); // Set cookie expiration
+                    options.SlidingExpiration = true; // Reset expiration time on each request
+                }
+            )
+            .AddOAuth("GitHub", options => { ConfigureGitHubOptions(options, configuration); });
 
         return services;
     }
@@ -29,21 +37,26 @@ public static class AuthenticationExtensions
     private static void ConfigureGitHubOptions(OAuthOptions options, IConfiguration configuration)
     {
         options.ClientId = configuration["GITHUB_CLIENT_ID"]
-                           ?? string.Empty; Console.WriteLine("GITHUB_CLIENT_ID not configured");
+                           ?? string.Empty;
+        Console.WriteLine("GITHUB_CLIENT_ID not configured");
 
         options.ClientSecret = configuration["GITHUB_CLIENT_SECRET"]
-                               ?? string.Empty; Console.WriteLine("GITHUB_CLIENT_SECRET not configured");
+                               ?? string.Empty;
+        Console.WriteLine("GITHUB_CLIENT_SECRET not configured");
 
         options.CallbackPath = new PathString(configuration["OAuth:CallbackPath"] ?? string.Empty);
 
         options.AuthorizationEndpoint = configuration["OAuth:AuthorizationEndpoint"]
-                                        ?? string.Empty; Console.WriteLine("OAuth:AuthorizationEndpoint not configured");
+                                        ?? string.Empty;
+        Console.WriteLine("OAuth:AuthorizationEndpoint not configured");
 
         options.TokenEndpoint = configuration["OAuth:TokenEndpoint"]
-                                ?? string.Empty; Console.WriteLine("OAuth:TokenEndpoint not configured");
+                                ?? string.Empty;
+        Console.WriteLine("OAuth:TokenEndpoint not configured");
 
         options.UserInformationEndpoint = configuration["OAuth:UserInformationEndpoint"]
-                                          ?? string.Empty; Console.WriteLine("OAuth:UserInformationEndpoint not configured");
+                                          ?? string.Empty;
+        Console.WriteLine("OAuth:UserInformationEndpoint not configured");
 
 
         options.Scope.Add(configuration["OAuth:Scope"] ?? string.Empty);
@@ -55,8 +68,8 @@ public static class AuthenticationExtensions
     private static void ConfigureClaimMappings(OAuthOptions options)
     {
         options.ClaimActions.MapJsonKey("login", "login");
+        options.ClaimActions.MapJsonKey("id", "id");
         options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
         options.ClaimActions.MapJsonKey("avatar_url", "avatar_url");
     }
 
@@ -67,11 +80,16 @@ public static class AuthenticationExtensions
             OnCreatingTicket = async context =>
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                request.Headers.Accept.Add(new ("application/json"));
-                request.Headers.Authorization = new ("Bearer", context.AccessToken);
+                request.Headers.Accept.Add(new("application/json"));
+                request.Headers.Authorization = new("Bearer", context.AccessToken);
 
-                var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
+                var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead,
+                    context.HttpContext.RequestAborted);
                 response.EnsureSuccessStatusCode();
+
+#if DEBUG
+                Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+#endif
 
                 var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
                 context.RunClaimActions(user.RootElement);

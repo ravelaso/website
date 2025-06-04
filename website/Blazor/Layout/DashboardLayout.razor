@@ -17,9 +17,9 @@
                             <div class="flex justify-between items-center">
                                 <h1 class="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
                                 <div class="flex items-center space-x-3 text-sm text-neutral-400">
-                                    <span>Welcome, @AuthService.GetUserName(context.User)</span>
+                                    <span>Welcome, @AuthorizationService.GetUserName(context.User)</span>
                                     <img class="w-9 h-9 rounded-full border border-neutral-700 shadow"
-                                         src="@AuthService.GetAvatar(context.User)" alt="Avatar" />
+                                         src="@AuthorizationService.GetAvatar(context.User)" alt="Avatar" />
                                     <a href="/auth/logout">
                                     <span class="w-9 h-9 rounded-full border border-neutral-700 shadow">
                                     Logout

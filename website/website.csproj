@@ -21,44 +21,4 @@
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000472950006.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000472950026.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000472950027.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000472950036.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180020.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180035.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180036.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180042.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180043.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180050.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180053.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180060.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180063.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000475180072.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850008.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850014.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850015.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850018.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850019.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850025.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850026.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850028.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850030.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850031.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000478850036.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090008.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090010.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090012.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090014.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090016.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090039.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090040.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090042.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090043.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090059.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090062.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090070.jpg" />
-      <_ContentIncludedByDefault Remove="wwwroot\images\thumbs\000480090073.jpg" />
-    </ItemGroup>
 </Project>
