@@ -36,30 +36,51 @@ public static class AuthenticationExtensions
 
     private static void ConfigureGitHubOptions(OAuthOptions options, IConfiguration configuration)
     {
-        options.ClientId = configuration["GITHUB_CLIENT_ID"]
-                           ?? string.Empty;
-        Console.WriteLine("GITHUB_CLIENT_ID not configured");
+        options.ClientId = configuration["GITHUB_CLIENT_ID"] ?? string.Empty;
+        if (string.IsNullOrEmpty(options.ClientId))
+        {
+            Console.WriteLine("GITHUB_CLIENT_ID not configured");
+        }
 
-        options.ClientSecret = configuration["GITHUB_CLIENT_SECRET"]
-                               ?? string.Empty;
-        Console.WriteLine("GITHUB_CLIENT_SECRET not configured");
+        options.ClientSecret = configuration["GITHUB_CLIENT_SECRET"] ?? string.Empty;
+        if (string.IsNullOrEmpty(options.ClientSecret))
+        {
+            Console.WriteLine("GITHUB_CLIENT_SECRET not configured");
+        }
 
         options.CallbackPath = new PathString(configuration["OAuth:CallbackPath"] ?? string.Empty);
+        if (string.IsNullOrEmpty(options.CallbackPath.Value))
+        {
+            Console.WriteLine("OAuth:CallbackPath not configured");
+        }
 
-        options.AuthorizationEndpoint = configuration["OAuth:AuthorizationEndpoint"]
-                                        ?? string.Empty;
-        Console.WriteLine("OAuth:AuthorizationEndpoint not configured");
+        options.AuthorizationEndpoint = configuration["OAuth:AuthorizationEndpoint"] ?? string.Empty;
+        if (string.IsNullOrEmpty(options.AuthorizationEndpoint))
+        {
+            Console.WriteLine("OAuth:AuthorizationEndpoint not configured");
+        }
 
-        options.TokenEndpoint = configuration["OAuth:TokenEndpoint"]
-                                ?? string.Empty;
-        Console.WriteLine("OAuth:TokenEndpoint not configured");
+        options.TokenEndpoint = configuration["OAuth:TokenEndpoint"] ?? string.Empty;
+        if (string.IsNullOrEmpty(options.TokenEndpoint))
+        {
+            Console.WriteLine("OAuth:TokenEndpoint not configured");
+        }
 
-        options.UserInformationEndpoint = configuration["OAuth:UserInformationEndpoint"]
-                                          ?? string.Empty;
-        Console.WriteLine("OAuth:UserInformationEndpoint not configured");
+        options.UserInformationEndpoint = configuration["OAuth:UserInformationEndpoint"] ?? string.Empty;
+        if (string.IsNullOrEmpty(options.UserInformationEndpoint))
+        {
+            Console.WriteLine("OAuth:UserInformationEndpoint not configured");
+        }
 
-
-        options.Scope.Add(configuration["OAuth:Scope"] ?? string.Empty);
+        var scope = configuration["OAuth:Scope"] ?? string.Empty;
+        if (!string.IsNullOrEmpty(scope))
+        {
+            options.Scope.Add(scope);
+        }
+        else
+        {
+            Console.WriteLine("OAuth:Scope not configured");
+        }
 
         ConfigureClaimMappings(options);
         ConfigureOAuthEvents(options);

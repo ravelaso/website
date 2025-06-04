@@ -1,11 +1,30 @@
 using System.Security.Claims;
 namespace website.Services
 {
-    public class AuthorizationService(IConfiguration configuration)
+    public class AllowedUser
     {
-        private readonly List<(string Username, string Id)> _allowedUsers =
-            configuration.GetSection("AllowedUsers")
-            .Get<List<(string Username, string Id)>>() ?? [];
+        public string Username { get; set; }
+        public string Id { get; set; }
+    }
+
+    public class AuthorizationService
+    {
+        private readonly List<AllowedUser> _allowedUsers;
+
+        public AuthorizationService(IConfiguration configuration)
+        {
+            // Fetching the AllowedUsers section from configuration and deserializing it
+            _allowedUsers = configuration.GetSection("AllowedUsers")
+                .Get<List<AllowedUser>>() ?? [];
+            #if DEBUG
+            // Log the loaded allowed users for debugging
+            Console.WriteLine("Loaded Allowed Users:");
+            foreach (var user in _allowedUsers)
+            {
+                Console.WriteLine($"Username: {user.Username}, ID: {user.Id}");
+            }
+            #endif
+        }
 
         public bool IsAuthorized(ClaimsPrincipal user)
         {
