@@ -16,7 +16,7 @@
         <h3 class="text-white font-semibold text-lg mb-4">Add New Project</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input @bind="_newProject.Title" placeholder="Project Title"
+            <input @bind="_newProject.Name" placeholder="Project Title"
                    class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
 
             <input @bind="_newProject.Link" placeholder="Link (optional)"
@@ -80,7 +80,7 @@
 
     private async Task AddProject()
     {
-        if (!string.IsNullOrWhiteSpace(_newProject.Title))
+        if (!string.IsNullOrWhiteSpace(_newProject.Name))
         {
             _newProject.Id = Guid.NewGuid().ToString();
             _newProject.Date = DateTime.Now;

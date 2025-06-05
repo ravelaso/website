@@ -1,29 +1,44 @@
 namespace website.Models;
 
 
-public interface IProject
+public interface IData
 {
-    string Id { get; set; }
-    string Title { get; set; }
-    string Description { get; set; }
-    DateTime Date { get; set; }
+   public string Name { get; set; }
 }
 
+public class ImageData: IData
+{
+    public string Name { get; set; } = string.Empty;
+    public string FullPath { get; set; } = string.Empty;
+    public string ThumbPath { get; set; } = string.Empty;
+    public bool HasThumbnail { get; set; }
+    public long FileSize { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 
-public class MusicProject : IProject
+    public string FormattedFileSize => FileSize switch
+    {
+        < 1024 => $"{FileSize} B",
+        < 1024 * 1024 => $"{FileSize / 1024:F1} KB",
+        < 1024 * 1024 * 1024 => $"{FileSize / (1024 * 1024):F1} MB",
+        _ => $"{FileSize / (1024 * 1024 * 1024):F1} GB"
+    };
+}
+
+public class MusicProject : IData
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
-    public string Title { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Link { get; set; } = string.Empty;
     public List<string> Tags { get; set; } = new();
     public DateTime Date { get; set; } = DateTime.Now;
 }
 
-public class CodeProject : IProject
+public class CodeProject : IData
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
-    public string Title { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string GitHubLink { get; set; } = string.Empty;
     public string DemoLink { get; set; } = string.Empty;
@@ -33,10 +48,10 @@ public class CodeProject : IProject
 
 public class MusicData
 {
-    public List<MusicProject> Projects { get; set; } = new();
+    public List<MusicProject> Projects { get; set; } = [];
 }
 
 public class CodeData
 {
-    public List<CodeProject> Projects { get; set; } = new();
+    public List<CodeProject> Projects { get; set; } = [];
 }

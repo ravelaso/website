@@ -1,3 +1,4 @@
+@using website.Models
 @using website.Services
 @inject ImageService ImageService
 
@@ -10,9 +11,9 @@ else
     <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 p-5">
         @foreach (var image in _images)
         {
-            <div class="mb-4 break-inside-avoid overflow-hidden relative group cursor-pointer transition-transform duration-300 hover:scale-105" @onclick="() => OpenModal(image.FileName)">
+            <div class="mb-4 break-inside-avoid overflow-hidden relative group cursor-pointer transition-transform duration-300 hover:scale-105" @onclick="() => OpenModal(image.Name)">
                 <img
-                    src="@($"/images/thumbs/{image.FileName}")"
+                    src="@($"/images/thumbs/{image.Name}")"
                     alt="Gallery Image"
                     loading="lazy"
                     class="w-full h-auto object-cover  "
@@ -56,7 +57,7 @@ else
 }
 
 @code {
-    private List<ImageInfo> _images = new();
+    private List<ImageData> _images = [];
     private bool _isModalOpen;
     private string? _selectedImage;
     private bool _imageLoaded;

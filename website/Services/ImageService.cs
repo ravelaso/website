@@ -1,18 +1,16 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Microsoft.AspNetCore.Components.Forms;
-
+using website.Models;
 namespace website.Services;
 
 public class ImageService
 {
-    private readonly IWebHostEnvironment _env;
     private readonly string _galleryPath;
     private readonly string _thumbsPath;
 
     public ImageService(IWebHostEnvironment env)
     {
-        _env = env;
         _galleryPath = Path.Combine(env.WebRootPath, "images", "gallery");
         _thumbsPath = Path.Combine(env.WebRootPath, "images", "thumbs");
 
@@ -21,34 +19,31 @@ public class ImageService
         Directory.CreateDirectory(_thumbsPath);
     }
 
-    public Task<List<ImageInfo>> GetAllImagesAsync()
+    public Task<List<ImageData>> GetAllImagesAsync()
     {
-        var images = new List<ImageInfo>();
+        var images = new List<ImageData>();
 
         if (!Directory.Exists(_galleryPath))
             return Task.FromResult(images);
 
         var files = Directory.GetFiles(_galleryPath)
-            .Where(f => IsValidImageFile(f))
+            .Where(IsValidImageFile)
             .OrderByDescending(File.GetCreationTime);
 
-        foreach (var file in files)
+        images.AddRange(from file in files
+        let fileName = Path.GetFileName(file)
+        let thumbPath = Path.Combine(_thumbsPath, fileName)
+        let fileInfo = new FileInfo(file)
+        select new ImageData
         {
-            var fileName = Path.GetFileName(file);
-            var thumbPath = Path.Combine(_thumbsPath, fileName);
-            var fileInfo = new FileInfo(file);
-
-            images.Add(new ImageInfo
-            {
-                FileName = fileName,
-                FullPath = file,
-                ThumbPath = thumbPath,
-                HasThumbnail = File.Exists(thumbPath),
-                FileSize = fileInfo.Length,
-                CreatedDate = fileInfo.CreationTime,
-                ModifiedDate = fileInfo.LastWriteTime
-            });
-        }
+            Name = fileName,
+            FullPath = file,
+            ThumbPath = thumbPath,
+            HasThumbnail = File.Exists(thumbPath),
+            FileSize = fileInfo.Length,
+            CreatedDate = fileInfo.CreationTime,
+            ModifiedDate = fileInfo.LastWriteTime
+        });
 
         return Task.FromResult(images);
     }
@@ -110,7 +105,7 @@ public class ImageService
 
         foreach (var image in images.Where(i => !i.HasThumbnail))
         {
-            await GenerateThumbnailAsync(image.FullPath, image.FileName);
+            await GenerateThumbnailAsync(image.FullPath, image.Name);
         }
     }
 
@@ -149,23 +144,4 @@ public class ImageService
         var invalidChars = Path.GetInvalidFileNameChars();
         return string.Join("_", fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
     }
-}
-
-public class ImageInfo
-{
-    public string FileName { get; set; } = string.Empty;
-    public string FullPath { get; set; } = string.Empty;
-    public string ThumbPath { get; set; } = string.Empty;
-    public bool HasThumbnail { get; set; }
-    public long FileSize { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime ModifiedDate { get; set; }
-
-    public string FormattedFileSize => FileSize switch
-    {
-        < 1024 => $"{FileSize} B",
-        < 1024 * 1024 => $"{FileSize / 1024:F1} KB",
-        < 1024 * 1024 * 1024 => $"{FileSize / (1024 * 1024):F1} MB",
-        _ => $"{FileSize / (1024 * 1024 * 1024):F1} GB"
-    };
 }

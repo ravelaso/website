@@ -3,7 +3,7 @@
 <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
     <div class="flex justify-between items-start mb-4">
         <div>
-            <h4 class="text-white font-semibold text-xl mb-1">@MusicData.Title</h4>
+            <h4 class="text-white font-semibold text-xl mb-1">@MusicData.Name</h4>
             <p class="text-neutral-500 text-sm">
                 📅 @(MusicData.Date == default ? "N/A" : MusicData.Date.ToString("yyyy-MM-dd"))
             </p>
@@ -33,7 +33,7 @@
         </a>
     }
 
-    @if (MusicData.Tags?.Any() == true)
+    @if (MusicData.Tags.Any())
     {
         <div class="flex flex-wrap gap-2 mt-3">
             @foreach (var tag in MusicData.Tags)
@@ -51,7 +51,7 @@
     public required MusicProject MusicData { get; set; }
 
     [Parameter]
-    public bool IsDeletable { get; set; } = false;
+    public bool IsDeletable { get; set; }
 
     [Parameter]
     public EventCallback<MusicProject> OnDelete { get; set; }
