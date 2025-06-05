@@ -45,34 +45,17 @@
         <div class="grid md:grid-cols-2 gap-6">
             @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
             {
-                <MusicCard musicData=project IsDeletable=true OnDelete="PromptDelete"/>
+                <MusicCard musicData=@project IsDeletable=true OnDelete="PromptDelete"/>
             }
         </div>
     }
 </div>
 
-@if (_showConfirmModal && _projectToDelete is not null)
-{
-    <div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-        <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-md shadow-xl">
-            <h3 class="text-white text-lg font-semibold mb-4">Confirm Deletion</h3>
-            <p class="text-neutral-300 mb-6">
-                Are you sure you want to delete <strong>@_projectToDelete.Title</strong>?
-            </p>
-
-            <div class="flex justify-end space-x-3">
-                <button @onclick="CancelDelete"
-                        class="px-4 py-2 bg-neutral-700 text-neutral-300 rounded-md hover:bg-neutral-600 transition">
-                    Cancel
-                </button>
-                <button @onclick="ConfirmDelete"
-                        class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition">
-                    Delete
-                </button>
-            </div>
-        </div>
-    </div>
-}
+<DeletePopup T="MusicProject"
+             Show="_showConfirmModal"
+             ItemToDelete="_projectToDelete"
+             OnConfirm="ConfirmDelete"
+             OnCancel="CancelDelete" />
 
 
 @code {
@@ -87,7 +70,7 @@
         try
         {
             var musicData = await DataService.LoadDataAsync<MusicData>("Music.json");
-            _musicProjects = musicData?.Projects ?? [];
+            _musicProjects = musicData.Projects;
         }
         catch
         {

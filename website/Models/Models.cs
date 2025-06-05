@@ -1,6 +1,16 @@
 namespace website.Models;
 
-public class MusicProject
+
+public interface IProject
+{
+    string Id { get; set; }
+    string Title { get; set; }
+    string Description { get; set; }
+    DateTime Date { get; set; }
+}
+
+
+public class MusicProject : IProject
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Title { get; set; } = string.Empty;
@@ -10,7 +20,7 @@ public class MusicProject
     public DateTime Date { get; set; } = DateTime.Now;
 }
 
-public class CodeProject
+public class CodeProject : IProject
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Title { get; set; } = string.Empty;
