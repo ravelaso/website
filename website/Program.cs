@@ -48,10 +48,5 @@ app.MapAuthenticationEndpoints();
 app.UseStaticFiles();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-ThumbnailGenerator.GenerateThumbnails(
-    "wwwroot/images/gallery/",
-    "wwwroot/images/thumbs/"
-);
-
+    
 app.Run();

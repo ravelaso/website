@@ -1,13 +1,14 @@
 ﻿services:
   website:
-    image: website
-    build:
-      context: .
-      dockerfile: website/Dockerfile
+    image: website:latest
     ports:
       - "8080:8080"
-    volumes:
-      - ./content/images:/app/wwwroot/images
-      - ./content/data:/app/wwwroot/data
     environment:
-      - DOTNET_ENVIRONMENT=Production
+      - GITHUB_CLIENT_ID=fill
+      - GITHUB_CLIENT_SECRET=fill
+      - ASPNETCORE_ENVIRONMENT=fill
+      - DOTNET_ENVIRONMENT=fill
+      
+    volumes:
+      - ./images:/app/wwwroot/images/
+      - ./data:/app/wwwroot/data/

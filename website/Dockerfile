@@ -1,5 +1,5 @@
 ﻿# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
@@ -12,10 +12,10 @@ RUN dotnet publish -c Release -o /app/publish
 
 # Copy .env file to the publish directory if it exists
 # This assumes the .env file will be present in the root of the context
-COPY .env /app/publish/
+#COPY .env /app/publish/
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:latest AS runtime
 WORKDIR /app
 
 # Copy the published app (including the .env file)
