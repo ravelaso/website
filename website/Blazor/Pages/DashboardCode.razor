@@ -11,9 +11,11 @@
     <h2 class="text-2xl font-bold text-white mb-4"> 💻 Code Projects</h2>
     <p class="text-neutral-400 mb-6">Add and manage your software projects below.</p>
 
-    <!-- Add Project Form -->
+    <!-- Add/Edit Project Form -->
     <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6 mb-10">
-        <h3 class="text-white font-semibold text-lg mb-4">Add New Project</h3>
+        <h3 class="text-white font-semibold text-lg mb-4">
+            @(_isEditing ? "Edit Project" : "Add New Project")
+        </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input @bind="_newProject.Name" placeholder="Project Title"
@@ -34,7 +36,7 @@
 
         <button @onclick="AddProject"
                 class="mt-5 bg-white text-black hover:bg-neutral-200 font-medium px-5 py-2 rounded-md transition">
-            ➕ Add Project
+            @(_isEditing ? "💾 Save Changes" : "➕ Add Project")
         </button>
     </div>
 
@@ -49,8 +51,9 @@
             @foreach (var project in _codeProjects.OrderByDescending(p => p.Date))
             {
                 <CodeCard CodeData="@project"
-                                  IsDeletable="true"
-                                  OnDelete="PromptDelete" />
+                          IsDeletable="true"
+                          OnDelete="PromptDelete"
+                          OnEdit="EditProject" />
             }
         </div>
     }
@@ -69,6 +72,7 @@
     private string _newTechnologies = string.Empty;
     private bool _showConfirmModal;
     private CodeProject? _projectToDelete;
+    private bool _isEditing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,7 +83,7 @@
         }
         catch
         {
-            _codeProjects = [];
+            _codeProjects = new();
         }
     }
 
@@ -87,20 +91,53 @@
     {
         if (!string.IsNullOrWhiteSpace(_newProject.Name))
         {
-            _newProject.Id = Guid.NewGuid().ToString();
+            // Set/update properties common to both add and edit
             _newProject.Date = DateTime.Now;
             _newProject.Technologies = _newTechnologies
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .ToList();
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .ToList();
 
+            // If adding new, ensure a new id is created if it's not editing
+            if (!_isEditing)
+            {
+                _newProject.Id = Guid.NewGuid().ToString();
+            }
+
+            // Update the _codeProjects list locally
+            var existing = _codeProjects.FirstOrDefault(p => p.Id == _newProject.Id);
+            if (existing != null)
+            {
+                _codeProjects.Remove(existing);
+            }
             _codeProjects.Add(_newProject);
 
-            await SaveData();
+            // Let the DataService handle the persistence generically.
+            await DataService.AddOrUpdateItemAsync<CodeProject, CodeData>(
+                _newProject,
+                "Code.json",
+                container => container.Projects);
 
             // Reset form
             _newProject = new CodeProject();
             _newTechnologies = string.Empty;
+            _isEditing = false;
         }
+    }
+
+    private void EditProject(CodeProject project)
+    {
+        _newProject = new CodeProject
+        {
+            Id = project.Id,
+            Name = project.Name,
+            GitHubLink = project.GitHubLink,
+            DemoLink = project.DemoLink,
+            Description = project.Description,
+            Date = project.Date,
+            Technologies = new List<string>(project.Technologies)
+        };
+        _newTechnologies = string.Join(", ", project.Technologies);
+        _isEditing = true;
     }
 
     private void PromptDelete(CodeProject project)
@@ -114,7 +151,9 @@
         if (_projectToDelete is not null)
         {
             _codeProjects.Remove(_projectToDelete);
-            await SaveData();
+            // You could also add a similar generic method for deletion.
+            var softwareData = new CodeData { Projects = _codeProjects };
+            await DataService.SaveDataAsync("Code.json", softwareData);
         }
         _projectToDelete = null;
         _showConfirmModal = false;
@@ -124,11 +163,5 @@
     {
         _projectToDelete = null;
         _showConfirmModal = false;
-    }
-
-    private async Task SaveData()
-    {
-        var softwareData = new CodeData { Projects = _codeProjects };
-        await DataService.SaveDataAsync("Projects.json", softwareData);
     }
 }

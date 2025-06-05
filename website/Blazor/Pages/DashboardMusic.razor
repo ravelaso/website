@@ -11,9 +11,11 @@
     <h2 class="text-2xl font-bold text-white mb-4">🎵 Music Projects</h2>
     <p class="text-neutral-400 mb-6">Add and manage your music projects below.</p>
 
-    <!-- Add Project Form -->
+    <!-- Add/Edit Project Form -->
     <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6 mb-10">
-        <h3 class="text-white font-semibold text-lg mb-4">Add New Project</h3>
+        <h3 class="text-white font-semibold text-lg mb-4">
+            @(_isEditing ? "Edit Project" : "Add New Project")
+        </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input @bind="_newProject.Name" placeholder="Project Title"
@@ -31,7 +33,7 @@
 
         <button @onclick="AddProject"
                 class="mt-5 bg-white text-black hover:bg-neutral-200 font-medium px-5 py-2 rounded-md transition">
-            ➕ Add Project
+            @(_isEditing ? "💾 Save Changes" : "➕ Add Project")
         </button>
     </div>
 
@@ -45,7 +47,10 @@
         <div class="grid md:grid-cols-2 gap-6">
             @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
             {
-                <MusicCard musicData=@project IsDeletable=true OnDelete="PromptDelete"/>
+                <MusicCard MusicData="@project" 
+                           IsDeletable="true" 
+                           OnDelete="PromptDelete" 
+                           OnEdit="EditProject" />
             }
         </div>
     }
@@ -57,13 +62,13 @@
              OnConfirm="ConfirmDelete"
              OnCancel="CancelDelete" />
 
-
 @code {
-    private List<MusicProject> _musicProjects = [];
+    private List<MusicProject> _musicProjects = new();
     private MusicProject _newProject = new();
     private string _newTags = string.Empty;
     private bool _showConfirmModal;
     private MusicProject? _projectToDelete;
+    private bool _isEditing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -74,7 +79,7 @@
         }
         catch
         {
-            _musicProjects = [];
+            _musicProjects = new();
         }
     }
 
@@ -82,11 +87,27 @@
     {
         if (!string.IsNullOrWhiteSpace(_newProject.Name))
         {
-            _newProject.Id = Guid.NewGuid().ToString();
             _newProject.Date = DateTime.Now;
-            _newProject.Tags = _newTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+            _newProject.Tags = _newTags
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
 
-            _musicProjects.Add(_newProject);
+            if (!_isEditing)
+            {
+                _newProject.Id = Guid.NewGuid().ToString();
+                _musicProjects.Add(_newProject);
+            }
+            else
+            {
+                // Replace the existing project with matching Id
+                var existing = _musicProjects.FirstOrDefault(p => p.Id == _newProject.Id);
+                if (existing != null)
+                {
+                    _musicProjects.Remove(existing);
+                }
+                _musicProjects.Add(_newProject);
+                _isEditing = false;
+            }
 
             await SaveData();
 
@@ -94,6 +115,21 @@
             _newProject = new MusicProject();
             _newTags = string.Empty;
         }
+    }
+
+    private void EditProject(MusicProject project)
+    {
+        _newProject = new MusicProject
+        {
+            Id = project.Id,
+            Name = project.Name,
+            Link = project.Link,
+            Description = project.Description,
+            Date = project.Date,
+            Tags = new List<string>(project.Tags)
+        };
+        _newTags = string.Join(", ", project.Tags);
+        _isEditing = true;
     }
 
     private void PromptDelete(MusicProject project)
@@ -109,7 +145,6 @@
             _musicProjects.Remove(_projectToDelete);
             await SaveData();
         }
-
         _projectToDelete = null;
         _showConfirmModal = false;
     }

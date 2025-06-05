@@ -9,14 +9,24 @@
             </p>
         </div>
 
-        @if (IsDeletable)
-        {
-            <button @onclick="() => OnDelete.InvokeAsync(CodeData)"
-                    class="text-neutral-400 hover:text-red-500 text-sm mt-1 transition"
-                    aria-label="Delete software project">
-                🗑 Delete
-            </button>
-        }
+        <div class="flex gap-2">
+            @if (OnEdit.HasDelegate)
+            {
+                <button @onclick="() => OnEdit.InvokeAsync(CodeData)" 
+                        class="text-neutral-400 hover:text-blue-500 text-sm mt-1 transition"
+                        aria-label="Edit software project">
+                    ✎ Edit
+                </button>
+            }
+            @if (IsDeletable)
+            {
+                <button @onclick="() => OnDelete.InvokeAsync(CodeData)"
+                        class="text-neutral-400 hover:text-red-500 text-sm mt-1 transition"
+                        aria-label="Delete software project">
+                    🗑 Delete
+                </button>
+            }
+        </div>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(CodeData.Description))
@@ -64,4 +74,7 @@
 
     [Parameter]
     public EventCallback<CodeProject> OnDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<CodeProject> OnEdit { get; set; }
 }

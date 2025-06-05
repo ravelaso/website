@@ -1,4 +1,5 @@
 using System.Text.Json;
+using website.Models;
 
 namespace website.Services;
 
@@ -27,13 +28,13 @@ public class DataService
             var json = await File.ReadAllTextAsync(filePath);
             return JsonSerializer.Deserialize<T>(json) ?? new T();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine("DataService.LoadDataAsync failed: {0}", e.Message);
             return new T();
         }
     }
-
+    
     public async Task SaveDataAsync<T>(string fileName, T data)
     {
         try
@@ -43,14 +44,32 @@ public class DataService
             {
                 WriteIndented = true
             });
-
             await File.WriteAllTextAsync(filePath, json);
-
         }
         catch (Exception e)
         {
             Console.WriteLine("DataService.SaveDataAsync failed: {0}", e.Message);
         }
+    }
 
+    // New generic method to add/update an item in a container
+    public async Task AddOrUpdateItemAsync<T, TContainer>(
+        T item,
+        string fileName,
+        Func<TContainer, List<T>> getItems)
+        where T : IData
+        where TContainer : new()
+    {
+        // Load current data container (for example CodeData or MusicData)
+        var container = await LoadDataAsync<TContainer>(fileName);
+        var list = getItems(container);
+        var existing = list.FirstOrDefault(x => x.Id == item.Id);
+        if (existing != null)
+        {
+            // Remove the existing item; alternatively you could update properties individually
+            list.Remove(existing);
+        }
+        list.Add(item);
+        await SaveDataAsync(fileName, container);
     }
 }

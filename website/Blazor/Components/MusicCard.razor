@@ -9,14 +9,24 @@
             </p>
         </div>
 
-        @if (IsDeletable)
-        {
-            <button @onclick="() => OnDelete.InvokeAsync(MusicData)"
-                    class="text-neutral-400 hover:text-red-500 text-sm mt-1 transition"
-                    aria-label="Delete music project">
-                🗑 Delete
-            </button>
-        }
+        <div class="flex gap-2">
+            @if (OnEdit.HasDelegate)
+            {
+                <button @onclick="() => OnEdit.InvokeAsync(MusicData)"
+                        class="text-neutral-400 hover:text-blue-500 text-sm mt-1 transition"
+                        aria-label="Edit music project">
+                    ✎ Edit
+                </button>
+            }
+            @if (IsDeletable)
+            {
+                <button @onclick="() => OnDelete.InvokeAsync(MusicData)"
+                        class="text-neutral-400 hover:text-red-500 text-sm mt-1 transition"
+                        aria-label="Delete music project">
+                    🗑 Delete
+                </button>
+            }
+        </div>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(MusicData.Description))
@@ -55,4 +65,7 @@
 
     [Parameter]
     public EventCallback<MusicProject> OnDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<MusicProject> OnEdit { get; set; }
 }

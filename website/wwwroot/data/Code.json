@@ -13,88 +13,88 @@
       "Date": "2025-06-01T11:23:19.947194+02:00"
     },
     {
-      "Id": "c27b68f9-0edf-4d7f-be4c-38ab40678eab",
-      "Name": "DJ-Meneo",
-      "Description": "Discord Bot to play music.",
-      "GitHubLink": "https://github.com/ravelaso/DJ-Meneo",
+      "Id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "Name": "Website",
+      "Description": "My website",
+      "GitHubLink": "https://github.com/ravelaso/website",
       "DemoLink": "",
       "Technologies": [
-        "typescript",
-        "discord.js"
+        ".NET",
+        "C#",
+        "Blazor"
+      ],
+      "Date": "2025-06-05T12:52:50.8759629+02:00"
+    },
+    {
+      "Id": "c3d4e5f6-g7h8-9012-cdef-345678901234",
+      "Name": "Project Template 4",
+      "Description": "Add your fourth project description here.",
+      "GitHubLink": "https://github.com/youruser/project4",
+      "DemoLink": "",
+      "Technologies": [
+        "technology1",
+        "technology2"
       ],
       "Date": "2025-06-01T11:23:19.947194+02:00"
     },
     {
-      "Id": "c27b68f9-0edf-4d7f-be4c-38ab40678eab",
-      "Name": "DJ-Meneo",
-      "Description": "Discord Bot to play music.",
-      "GitHubLink": "https://github.com/ravelaso/DJ-Meneo",
+      "Id": "d4e5f6g7-h8i9-0123-def4-56789012345a",
+      "Name": "Project Template 5",
+      "Description": "Add your fifth project description here.",
+      "GitHubLink": "https://github.com/youruser/project5",
       "DemoLink": "",
       "Technologies": [
-        "typescript",
-        "discord.js"
+        "technology1",
+        "technology2"
       ],
       "Date": "2025-06-01T11:23:19.947194+02:00"
     },
     {
-      "Id": "c27b68f9-0edf-4d7f-be4c-38ab40678eab",
-      "Name": "DJ-Meneo",
-      "Description": "Discord Bot to play music.",
-      "GitHubLink": "https://github.com/ravelaso/DJ-Meneo",
+      "Id": "e5f6g7h8-i9j0-1234-ef56-789012345abc",
+      "Name": "Project Template 6",
+      "Description": "Add your sixth project description here.",
+      "GitHubLink": "https://github.com/youruser/project6",
       "DemoLink": "",
       "Technologies": [
-        "typescript",
-        "discord.js"
+        "technology1",
+        "technology2"
       ],
       "Date": "2025-06-01T11:23:19.947194+02:00"
     },
     {
-      "Id": "c27b68f9-0edf-4d7f-be4c-38ab40678eab",
-      "Name": "DJ-Meneo",
-      "Description": "Discord Bot to play music.",
-      "GitHubLink": "https://github.com/ravelaso/DJ-Meneo",
+      "Id": "f6g7h8i9-j0k1-2345-fg67-89012345abcd",
+      "Name": "Project Template 7",
+      "Description": "Add your seventh project description here.",
+      "GitHubLink": "https://github.com/youruser/project7",
       "DemoLink": "",
       "Technologies": [
-        "typescript",
-        "discord.js"
+        "technology1",
+        "technology2"
       ],
       "Date": "2025-06-01T11:23:19.947194+02:00"
     },
     {
-      "Id": "c27b68f9-0edf-4d7f-be4c-38ab40678eab",
-      "Name": "DJ-Meneo",
-      "Description": "Discord Bot to play music.",
-      "GitHubLink": "https://github.com/ravelaso/DJ-Meneo",
+      "Id": "g7h8i9j0-k1l2-3456-gh78-9012345abcde",
+      "Name": "Project Template 8",
+      "Description": "Add your eighth project description here.",
+      "GitHubLink": "https://github.com/youruser/project8",
       "DemoLink": "",
       "Technologies": [
-        "typescript",
-        "discord.js"
+        "technology1",
+        "technology2"
       ],
       "Date": "2025-06-01T11:23:19.947194+02:00"
     },
     {
-      "Id": "c27b68f9-0edf-4d7f-be4c-38ab40678eab",
-      "Name": "DJ-Meneo",
-      "Description": "Discord Bot to play music.",
-      "GitHubLink": "https://github.com/ravelaso/DJ-Meneo",
+      "Id": "b2c3d4e5-f6g7-8901-bcde-f23456789012",
+      "Name": "Edit Test ",
+      "Description": "Add your third project description here.",
+      "GitHubLink": "https://github.com/youruser/project3",
       "DemoLink": "",
       "Technologies": [
-        "typescript",
-        "discord.js"
+        ".NET"
       ],
-      "Date": "2025-06-01T11:23:19.947194+02:00"
-    },
-    {
-      "Id": "c27b68f9-0edf-4d7f-be4c-38ab40678eab",
-      "Name": "DJ-Meneo",
-      "Description": "Discord Bot to play music.",
-      "GitHubLink": "https://github.com/ravelaso/DJ-Meneo",
-      "DemoLink": "",
-      "Technologies": [
-        "typescript",
-        "discord.js"
-      ],
-      "Date": "2025-06-01T11:23:19.947194+02:00"
+      "Date": "2025-06-05T12:59:39.3800943+02:00"
     }
   ]
 }

@@ -3,11 +3,13 @@ namespace website.Models;
 
 public interface IData
 {
-   public string Name { get; set; }
+    public string Name { get; set; }
+    public string? Id { get; set; }
 }
 
 public class ImageData: IData
 {
+    public string? Id { get; set; } = null;
     public string Name { get; set; } = string.Empty;
     public string FullPath { get; set; } = string.Empty;
     public string ThumbPath { get; set; } = string.Empty;
@@ -27,7 +29,7 @@ public class ImageData: IData
 
 public class MusicProject : IData
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string? Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Link { get; set; } = string.Empty;
@@ -37,7 +39,7 @@ public class MusicProject : IData
 
 public class CodeProject : IData
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string? Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string GitHubLink { get; set; } = string.Empty;
