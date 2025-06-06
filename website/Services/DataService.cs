@@ -51,6 +51,12 @@ namespace website.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<AboutEntry?> LoadAboutEntriesByTypeAsync(AboutType type)
+        {
+            return await _context.AboutEntries
+                .FirstOrDefaultAsync(entry => entry.Type == type);
+        }
+
         // New method to delete a music project
         public async Task DeleteMusicProjectAsync(string id)
         {

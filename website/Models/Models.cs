@@ -7,6 +7,20 @@ public interface IData
     public string? Id { get; set; }
 }
 
+public enum AboutType
+{
+    Music,
+    Code
+}
+
+public class AboutEntry
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public AboutType Type { get; set; }
+}
+
 public class ImageData: IData
 {
     public string? Id { get; set; } = null;
