@@ -5,7 +5,8 @@
 @inject DataService DataService
 @rendermode InteractiveServer
 
-<PageTitle>Projects Management - Dashboard</PageTitle>
+
+<PageTitle>Code Management - Dashboard</PageTitle>
 
 <div class="bg-neutral-950 rounded-xl border border-neutral-800 p-6">
     <h2 class="text-2xl font-bold text-white mb-4"> 💻 Code Projects</h2>
@@ -19,19 +20,19 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input @bind="_newProject.Name" placeholder="Project Title"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <input @bind="_newProject.GitHubLink" placeholder="GitHub Link (optional)"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <input @bind="_newProject.DemoLink" placeholder="Demo Link (optional)"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <textarea @bind="_newProject.Description" placeholder="Description"
-                      class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500"></textarea>
+                      class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500 w-full"></textarea>
 
             <input @bind="_newTechnologies" placeholder="Technologies (comma separated)"
-                   class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
         </div>
 
         <button @onclick="AddProject"
@@ -58,6 +59,7 @@
         </div>
     }
 </div>
+
 
 <DeletePopup T="CodeProject"
              Show="_showConfirmModal"

@@ -19,16 +19,16 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input @bind="_newProject.Name" placeholder="Project Title"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <input @bind="_newProject.Link" placeholder="Link (optional)"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <textarea @bind="_newProject.Description" placeholder="Description"
-                      class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500"></textarea>
+                      class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500 w-full"></textarea>
 
             <input @bind="_newTags" placeholder="Tags (comma separated)"
-                   class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
         </div>
 
         <button @onclick="AddProject"
@@ -47,9 +47,9 @@
         <div class="grid md:grid-cols-2 gap-6">
             @foreach (var project in _musicProjects.OrderByDescending(p => p.Date))
             {
-                <MusicCard MusicData="@project" 
-                           IsDeletable="true" 
-                           OnDelete="PromptDelete" 
+                <MusicCard MusicData="@project"
+                           IsDeletable="true"
+                           OnDelete="PromptDelete"
                            OnEdit="EditProject" />
             }
         </div>
