@@ -13,7 +13,7 @@
     <div class="hidden md:flex flex-1">
         <!-- About Section -->
         <div class="w-1/2 flex items-center p-8">
-            <AboutSection FileName="aboutmusic.json"/>
+            <AboutSection Type="@AboutType.Music"/>
         </div>
 
         <!-- Scrollable Projects -->
@@ -38,7 +38,7 @@
 
     <!-- Mobile Layout -->
     <div class="md:hidden px-4 pb-6 space-y-8">
-        <AboutSection FileName="aboutmusic.json"/>
+        <AboutSection Type="AboutType.Music"/>
 
         @if (_musicProjects.Count == 0)
         {
@@ -83,8 +83,8 @@
     {
         try
         {
-            var musicData = await DataService.LoadDataAsync<MusicData>("Music.json");
-            _musicProjects = musicData?.Projects ?? [];
+            var musicData = await DataService.LoadMusicProjectsAsync();
+            _musicProjects = musicData ?? [];
         }
         catch
         {

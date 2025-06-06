@@ -1,75 +1,106 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using website.Models;
 
-namespace website.Services;
-
-public class DataService
+namespace website.Services
 {
-    private readonly string _dataPath;
-
-    public DataService(IWebHostEnvironment env)
+    public class DataService
     {
-        _dataPath = Path.Combine(env.WebRootPath, "data");
-        Directory.CreateDirectory(_dataPath);
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<T> LoadDataAsync<T>(string fileName) where T : new()
-    {
-        var filePath = Path.Combine(_dataPath, fileName);
-
-        if (!File.Exists(filePath))
+        public DataService()
         {
-            Console.WriteLine("DataService.LoadDataAsync failed: No data file found.");
-            return new T();
+            _context = new AppDbContext();
+            _context.Database.EnsureCreated(); // Ensure the database is created
         }
 
-        try
+        public async Task<bool> IsUserAllowedAsync(string userId, string userName)
         {
-            var json = await File.ReadAllTextAsync(filePath);
-            return JsonSerializer.Deserialize<T>(json) ?? new T();
+            return await _context.AllowedUsers.AnyAsync(u => u.Id == userId && u.Username == userName);
         }
-        catch (Exception e)
+
+        public bool IsUserAllowed(string userId, string userName)
         {
-            Console.WriteLine("DataService.LoadDataAsync failed: {0}", e.Message);
-            return new T();
+            return  _context.AllowedUsers.Any(u => u.Id == userId && u.Username == userName);
         }
-    }
-    
-    public async Task SaveDataAsync<T>(string fileName, T data)
-    {
-        try
+
+        public async Task<List<MusicProject>> LoadMusicProjectsAsync()
         {
-            var filePath = Path.Combine(_dataPath, fileName);
-            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions
+            return await _context.MusicProjects.ToListAsync();
+        }
+
+        public async Task<List<CodeProject>> LoadCodeProjectsAsync()
+        {
+            return await _context.CodeProjects.ToListAsync();
+        }
+
+        public async Task AddOrUpdateMusicProjectAsync(MusicProject project)
+        {
+            var existingProject = await _context.MusicProjects.FindAsync(project.Id);
+            if (existingProject != null)
             {
-                WriteIndented = true
-            });
-            await File.WriteAllTextAsync(filePath, json);
+                _context.Entry(existingProject).CurrentValues.SetValues(project);
+            }
+            else
+            {
+                await _context.MusicProjects.AddAsync(project);
+            }
+            await _context.SaveChangesAsync();
         }
-        catch (Exception e)
-        {
-            Console.WriteLine("DataService.SaveDataAsync failed: {0}", e.Message);
-        }
-    }
 
-    // New generic method to add/update an item in a container
-    public async Task AddOrUpdateItemAsync<T, TContainer>(
-        T item,
-        string fileName,
-        Func<TContainer, List<T>> getItems)
-        where T : IData
-        where TContainer : new()
-    {
-        // Load current data container (for example CodeData or MusicData)
-        var container = await LoadDataAsync<TContainer>(fileName);
-        var list = getItems(container);
-        var existing = list.FirstOrDefault(x => x.Id == item.Id);
-        if (existing != null)
+        public async Task AddOrUpdateCodeProjectAsync(CodeProject project)
         {
-            // Remove the existing item; alternatively you could update properties individually
-            list.Remove(existing);
+            var existingProject = await _context.CodeProjects.FindAsync(project.Id);
+            if (existingProject != null)
+            {
+                _context.Entry(existingProject).CurrentValues.SetValues(project);
+            }
+            else
+            {
+                await _context.CodeProjects.AddAsync(project);
+            }
+            await _context.SaveChangesAsync();
         }
-        list.Add(item);
-        await SaveDataAsync(fileName, container);
+
+        public async Task<AboutEntry?> LoadAboutEntriesByTypeAsync(AboutType type)
+        {
+            return await _context.AboutEntries
+                .FirstOrDefaultAsync(entry => entry.Type == type);
+        }
+
+        public async Task AddOrUpdateAboutEntryAsync(AboutEntry entry)
+        {
+            var existingEntry = await _context.AboutEntries.FindAsync(entry.Id);
+            if (existingEntry != null)
+            {
+                _context.Entry(existingEntry).CurrentValues.SetValues(entry);
+            }
+            else
+            {
+                await _context.AboutEntries.AddAsync(entry);
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        // New method to delete a music project
+        public async Task DeleteMusicProjectAsync(string id)
+        {
+            var projectToDelete = await _context.MusicProjects.FindAsync(id);
+            if (projectToDelete != null)
+            {
+                _context.MusicProjects.Remove(projectToDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // New method to delete a code project
+        public async Task DeleteCodeProjectAsync(string id)
+        {
+            var projectToDelete = await _context.CodeProjects.FindAsync(id);
+            if (projectToDelete != null)
+            {
+                _context.CodeProjects.Remove(projectToDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

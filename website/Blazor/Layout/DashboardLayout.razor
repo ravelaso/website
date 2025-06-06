@@ -14,16 +14,16 @@
                     <!-- Dashboard Header -->
                     <header class="bg-neutral-900 border-b border-neutral-800 shadow-sm">
                         <div class="max-w-7xl mx-auto px-4 py-4">
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col md:flex-row justify-between items-center">
                                 <h1 class="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
-                                <div class="flex items-center space-x-3 text-sm text-neutral-400">
+                                <div class="flex items-center space-x-3 text-sm text-neutral-400 mt-2 md:mt-0">
                                     <span>Welcome, @AuthorizationService.GetUserName(context.User)</span>
                                     <img class="w-9 h-9 rounded-full border border-neutral-700 shadow"
                                          src="@AuthorizationService.GetAvatar(context.User)" alt="Avatar" />
-                                    <a href="/auth/logout">
-                                    <span class="w-9 h-9 rounded-full border border-neutral-700 shadow">
-                                    Logout
-                                    </span>
+                                    <a href="/auth/logout" class="text-neutral-400 hover:text-white">
+                                        <span class="w-9 h-9 rounded-full border border-neutral-700 shadow">
+                                            Logout
+                                        </span>
                                     </a>
                                 </div>
                             </div>
@@ -33,7 +33,7 @@
                     <!-- Dashboard Navigation -->
                     <nav class="bg-neutral-950 border-b border-neutral-800">
                         <div class="max-w-7xl mx-auto px-4">
-                            <ul class="flex space-x-6 py-3 text-sm font-medium">
+                            <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 py-3 text-sm font-medium">
                                 <li>
                                     <a href="/dashboard/images"
                                        class="text-neutral-400 hover:text-white hover:bg-neutral-800 px-3 py-2 rounded transition-colors duration-200">
@@ -50,6 +50,12 @@
                                     <a href="/dashboard/code"
                                        class="text-neutral-400 hover:text-white hover:bg-neutral-800 px-3 py-2 rounded transition-colors duration-200">
                                         💻 Code
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/dashboard/about"
+                                       class="text-neutral-400 hover:text-white hover:bg-neutral-800 px-3 py-2 rounded transition-colors duration-200">
+                                        📃 About
                                     </a>
                                 </li>
                             </ul>

@@ -7,7 +7,6 @@
 
 <PageTitle>Image Gallery - Dashboard</PageTitle>
 
-
 <div class="space-y-6">
     <!-- Header -->
     <div class="bg-neutral-950 rounded-lg border border-neutral-800 p-6">
@@ -19,7 +18,7 @@
     <div class="bg-neutral-950 rounded-lg border border-neutral-800 p-6">
         <h3 class="text-lg font-medium text-white mb-4">Upload Images</h3>
 
-        <div class="border-2 border-dashed border-neutral-700 rounded-lg p-6">
+        <div class="border-2 border-dashed border-neutral-700 rounded-lg p-6 mb-4">
             <InputFile OnChange="HandleFileSelection"
                        multiple
                        accept="image/*"
@@ -33,32 +32,34 @@
 
         @if (_uploadQueue.Any())
         {
-            @foreach (var entry in _uploadQueue)
-            {
-                <div class="bg-neutral-800 rounded px-3 py-2 mb-2 flex justify-between items-center">
-                    <div>
-                        <span class="text-neutral-200 text-sm">@entry.File.Name</span>
-                        <span class="text-neutral-500 text-xs ml-2">(@(entry.File.Size) bytes)</span>
+            <div class="space-y-2">
+                @foreach (var entry in _uploadQueue)
+                {
+                    <div class="bg-neutral-800 rounded px-3 py-2 flex justify-between items-center">
+                        <div>
+                            <span class="text-neutral-200 text-sm">@entry.File.Name</span>
+                            <span class="text-neutral-500 text-xs ml-2">(@(entry.File.Size) bytes)</span>
+                        </div>
+                        <div>
+                            @switch (entry.Status)
+                            {
+                                case "Uploading":
+                                    <span class="text-yellow-400 text-xs animate-pulse">Uploading...</span>
+                                    break;
+                                case "Success":
+                                    <span class="text-green-400 text-xs">Uploaded ✅</span>
+                                    break;
+                                case "Error":
+                                    <span class="text-red-400 text-xs">Failed ❌</span>
+                                    break;
+                                default:
+                                    <span class="text-neutral-500 text-xs">Waiting...</span>
+                                    break;
+                            }
+                        </div>
                     </div>
-                    <div>
-                        @switch (entry.Status)
-                        {
-                            case "Uploading":
-                                <span class="text-yellow-400 text-xs animate-pulse">Uploading...</span>
-                                break;
-                            case "Success":
-                                <span class="text-green-400 text-xs">Uploaded ✅</span>
-                                break;
-                            case "Error":
-                                <span class="text-red-400 text-xs">Failed ❌</span>
-                                break;
-                            default:
-                                <span class="text-neutral-500 text-xs">Waiting...</span>
-                                break;
-                        }
-                    </div>
-                </div>
-            }
+                }
+            </div>
             <div class="mt-4">
                 <button @onclick="UploadFiles"
                         disabled="@(!_uploadQueue.Any())"
@@ -88,7 +89,7 @@
 
         @if (_existingImages.Any())
         {
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 @foreach (var image in _existingImages)
                 {
                     <div class="bg-neutral-900 rounded-lg border border-neutral-800 overflow-hidden shadow-sm">
@@ -136,6 +137,7 @@
         }
     </div>
 </div>
+
 
 <DeletePopup T="ImageData"
              Show="_showConfirmModal"

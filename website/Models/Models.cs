@@ -7,6 +7,20 @@ public interface IData
     public string? Id { get; set; }
 }
 
+public enum AboutType
+{
+    Music,
+    Code
+}
+
+public class AboutEntry
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public AboutType Type { get; set; }
+}
+
 public class ImageData: IData
 {
     public string? Id { get; set; } = null;
@@ -48,12 +62,8 @@ public class CodeProject : IData
     public DateTime Date { get; set; } = DateTime.Now;
 }
 
-public class MusicData
+public class AllowedUser
 {
-    public List<MusicProject> Projects { get; set; } = [];
-}
-
-public class CodeData
-{
-    public List<CodeProject> Projects { get; set; } = [];
+    public string Id { get; set; } = string.Empty; // GitHub user ID
+    public string Username { get; set; } = string.Empty; // GitHub username
 }

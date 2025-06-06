@@ -7,3 +7,4 @@ riderModule.iml
 .env
 node_modules
 /website/wwwroot/images/thumbs/
+*.db

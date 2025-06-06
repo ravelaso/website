@@ -5,7 +5,8 @@
 @inject DataService DataService
 @rendermode InteractiveServer
 
-<PageTitle>Projects Management - Dashboard</PageTitle>
+
+<PageTitle>Code Management - Dashboard</PageTitle>
 
 <div class="bg-neutral-950 rounded-xl border border-neutral-800 p-6">
     <h2 class="text-2xl font-bold text-white mb-4"> 💻 Code Projects</h2>
@@ -19,19 +20,19 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input @bind="_newProject.Name" placeholder="Project Title"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <input @bind="_newProject.GitHubLink" placeholder="GitHub Link (optional)"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <input @bind="_newProject.DemoLink" placeholder="Demo Link (optional)"
-                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
 
             <textarea @bind="_newProject.Description" placeholder="Description"
-                      class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500"></textarea>
+                      class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500 w-full"></textarea>
 
             <input @bind="_newTechnologies" placeholder="Technologies (comma separated)"
-                   class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500" />
+                   class="col-span-2 bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
         </div>
 
         <button @onclick="AddProject"
@@ -59,6 +60,7 @@
     }
 </div>
 
+
 <DeletePopup T="CodeProject"
              Show="_showConfirmModal"
              ItemToDelete="_projectToDelete"
@@ -72,18 +74,17 @@
     private string _newTechnologies = string.Empty;
     private bool _showConfirmModal;
     private CodeProject? _projectToDelete;
-    private bool _isEditing = false;
+    private bool _isEditing;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var softwareData = await DataService.LoadDataAsync<CodeData>("Code.json");
-            _codeProjects = softwareData.Projects;
+            _codeProjects = await DataService.LoadCodeProjectsAsync();
         }
         catch
         {
-            _codeProjects = new();
+            _codeProjects = [];
         }
     }
 
@@ -91,36 +92,33 @@
     {
         if (!string.IsNullOrWhiteSpace(_newProject.Name))
         {
-            // Set/update properties common to both add and edit
             _newProject.Date = DateTime.Now;
             _newProject.Technologies = _newTechnologies
-                        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                        .ToList();
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
 
-            // If adding new, ensure a new id is created if it's not editing
             if (!_isEditing)
             {
                 _newProject.Id = Guid.NewGuid().ToString();
+                _codeProjects.Add(_newProject);
             }
-
-            // Update the _codeProjects list locally
-            var existing = _codeProjects.FirstOrDefault(p => p.Id == _newProject.Id);
-            if (existing != null)
+            else
             {
-                _codeProjects.Remove(existing);
+                // Replace the existing project with matching Id
+                var existing = _codeProjects.FirstOrDefault(p => p.Id == _newProject.Id);
+                if (existing != null)
+                {
+                    _codeProjects.Remove(existing);
+                }
+                _codeProjects.Add(_newProject);
+                _isEditing = false;
             }
-            _codeProjects.Add(_newProject);
 
-            // Let the DataService handle the persistence generically.
-            await DataService.AddOrUpdateItemAsync<CodeProject, CodeData>(
-                _newProject,
-                "Code.json",
-                container => container.Projects);
+            await SaveData();
 
             // Reset form
-            _newProject = new CodeProject();
+            _newProject = new();
             _newTechnologies = string.Empty;
-            _isEditing = false;
         }
     }
 
@@ -130,9 +128,9 @@
         {
             Id = project.Id,
             Name = project.Name,
+            Description = project.Description,
             GitHubLink = project.GitHubLink,
             DemoLink = project.DemoLink,
-            Description = project.Description,
             Date = project.Date,
             Technologies = new List<string>(project.Technologies)
         };
@@ -150,10 +148,8 @@
     {
         if (_projectToDelete is not null)
         {
-            _codeProjects.Remove(_projectToDelete);
-            // You could also add a similar generic method for deletion.
-            var softwareData = new CodeData { Projects = _codeProjects };
-            await DataService.SaveDataAsync("Code.json", softwareData);
+            await DataService.DeleteCodeProjectAsync(_projectToDelete.Id!); // Delete from database
+            _codeProjects.Remove(_projectToDelete); // Update local list
         }
         _projectToDelete = null;
         _showConfirmModal = false;
@@ -163,5 +159,10 @@
     {
         _projectToDelete = null;
         _showConfirmModal = false;
+    }
+
+    private async Task SaveData()
+    {
+        await DataService.AddOrUpdateCodeProjectAsync(_newProject);
     }
 }

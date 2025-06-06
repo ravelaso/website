@@ -1,0 +1,58 @@
+@page "/dashboard/about"
+@using website.Models
+@using website.Services
+@inject DataService DataService
+@layout Layout.DashboardLayout
+
+<PageTitle>About Management - Dashboard</PageTitle>
+
+<div class="bg-neutral-950 rounded-xl border border-neutral-800 p-6">
+    <h2 class="text-2xl font-bold text-white mb-4">About Sections</h2>
+    <p class="text-neutral-400 mb-6">Edit the about sections for Music and Code below.</p>
+
+    <!-- Music About Section -->
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6 mb-10">
+        <h3 class="text-white font-semibold text-lg mb-4">Music About Section</h3>
+        <input @bind="_musicAboutEntry.Title" placeholder="Title"
+               class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
+        <textarea @bind="_musicAboutEntry.Description" placeholder="Description"
+                  class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500 w-full mt-2"></textarea>
+        <button @onclick="SaveMusicAbout" class="mt-5 bg-white text-black hover:bg-neutral-200 font-medium px-5 py-2 rounded-md transition">
+            Save Music About
+        </button>
+    </div>
+
+    <!-- Code About Section -->
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6 mb-10">
+        <h3 class="text-white font-semibold text-lg mb-4">Code About Section</h3>
+        <input @bind="_codeAboutEntry.Title" placeholder="Title"
+               class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 placeholder:text-neutral-500 w-full" />
+        <textarea @bind="_codeAboutEntry.Description" placeholder="Description"
+                  class="bg-neutral-950 text-white border border-neutral-700 rounded-md px-4 py-2 h-24 placeholder:text-neutral-500 w-full mt-2"></textarea>
+        <button @onclick="SaveCodeAbout" class="mt-5 bg-white text-black hover:bg-neutral-200 font-medium px-5 py-2 rounded-md transition">
+            Save Code About
+        </button>
+    </div>
+</div>
+
+@code {
+    private AboutEntry _musicAboutEntry = new AboutEntry { Type = AboutType.Music };
+    private AboutEntry _codeAboutEntry = new AboutEntry { Type = AboutType.Code };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load the existing About entries
+        _musicAboutEntry = await DataService.LoadAboutEntriesByTypeAsync(AboutType.Music) ?? _musicAboutEntry;
+        _codeAboutEntry = await DataService.LoadAboutEntriesByTypeAsync(AboutType.Code) ?? _codeAboutEntry;
+    }
+
+    private async Task SaveMusicAbout()
+    {
+        await DataService.AddOrUpdateAboutEntryAsync(_musicAboutEntry);
+    }
+
+    private async Task SaveCodeAbout()
+    {
+        await DataService.AddOrUpdateAboutEntryAsync(_codeAboutEntry);
+    }
+}

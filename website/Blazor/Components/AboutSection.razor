@@ -1,11 +1,12 @@
+@using website.Models
 @using website.Services
 @inject DataService DataService
 
-@if (data is not null)
+@if (_data is not null)
 {
     <section class="max-w-3xl mx-auto bg-muted p-8 rounded-2xl shadow-lg my-10 transition-all">
-        <h2 class="text-3xl font-bold text-foreground mb-4">@data.Title</h2>
-        <p class="text-muted-foreground text-lg leading-relaxed whitespace-pre-line">@data.Description</p>
+        <h2 class="text-3xl font-bold text-foreground mb-4">@_data.Title</h2>
+        <p class="text-muted-foreground text-lg leading-relaxed whitespace-pre-line">@_data.Description</p>
     </section>
 }
 else
@@ -14,18 +15,14 @@ else
 }
 
 @code {
-    [Parameter] public string FileName { get; set; } = default!;
 
-    private AboutModel? data;
+    [Parameter]
+    public required AboutType Type { get; init;}
+
+    private AboutEntry? _data;
 
     protected override async Task OnInitializedAsync()
     {
-        data = await DataService.LoadDataAsync<AboutModel>(FileName);
-    }
-
-    public class AboutModel
-    {
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        _data = await DataService.LoadAboutEntriesByTypeAsync(Type);
     }
 }
