@@ -3,8 +3,8 @@ namespace website.Services
 {
     public class AllowedUser
     {
-        public string Username { get; set; }
-        public string Id { get; set; }
+        public required string Username { get; init; }
+        public required string Id { get; init; }
     }
 
     public class AuthorizationService
@@ -16,14 +16,6 @@ namespace website.Services
             // Fetching the AllowedUsers section from configuration and deserializing it
             _allowedUsers = configuration.GetSection("AllowedUsers")
                 .Get<List<AllowedUser>>() ?? [];
-            #if DEBUG
-            // Log the loaded allowed users for debugging
-            Console.WriteLine("Loaded Allowed Users:");
-            foreach (var user in _allowedUsers)
-            {
-                Console.WriteLine($"Username: {user.Username}, ID: {user.Id}");
-            }
-            #endif
         }
 
         public bool IsAuthorized(ClaimsPrincipal user)
@@ -33,13 +25,6 @@ namespace website.Services
 
             var username = user.FindFirst("login")?.Value;
             var userId = user.FindFirst("id")?.Value;
-
-            Console.WriteLine($"user: {username}, id: {userId}");
-
-            foreach (var aUser in _allowedUsers)
-            {
-                Console.WriteLine($"Username: {aUser.Username}, ID: {aUser.Id}");
-            }
 
             return !string.IsNullOrEmpty(username) &&
                    !string.IsNullOrEmpty(userId) &&
