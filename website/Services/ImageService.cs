@@ -8,12 +8,13 @@ public class ImageService
 {
     private readonly string _galleryPath;
     private readonly string _thumbsPath;
+    private readonly AppDbContext _context;
 
-    public ImageService(IWebHostEnvironment env)
+    public ImageService(IWebHostEnvironment env, AppDbContext context)
     {
         _galleryPath = Path.Combine(env.WebRootPath, "images", "gallery");
         _thumbsPath = Path.Combine(env.WebRootPath, "images", "thumbs");
-
+        _context = context;
         // Ensure directories exist
         Directory.CreateDirectory(_galleryPath);
         Directory.CreateDirectory(_thumbsPath);
@@ -32,13 +33,16 @@ public class ImageService
 
         images.AddRange(from file in files
         let fileName = Path.GetFileName(file)
+        let format = Path.GetExtension(file).ToLowerInvariant()
         let thumbPath = Path.Combine(_thumbsPath, fileName)
         let fileInfo = new FileInfo(file)
         select new ImageData
         {
+            Id = fileName,
             Name = fileName,
             FullPath = file,
             ThumbPath = thumbPath,
+            ImageFormat = format,
             HasThumbnail = File.Exists(thumbPath),
             FileSize = fileInfo.Length,
             CreatedDate = fileInfo.CreationTime,
@@ -55,33 +59,56 @@ public class ImageService
 
         try
         {
-            // Generate unique filename to prevent conflicts
             var fileName = $"{SanitizeFileName(file.Name)}";
             var filePath = Path.Combine(_galleryPath, fileName);
+            var format = Path.GetExtension(file.Name).ToLowerInvariant();
+            await using var memoryStream = new MemoryStream();
+            await file.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024).CopyToAsync(memoryStream);
 
-            // Save original image
-            await using (var stream = new FileStream(filePath, FileMode.Create))
+            // Save file to disk
+            await using (var fs = new FileStream(filePath, FileMode.Create))
             {
-                await file.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024).CopyToAsync(stream); // 100MB limit
+                memoryStream.Position = 0;
+                await memoryStream.CopyToAsync(fs);
             }
 
-            // Generate thumbnail
             await GenerateThumbnailAsync(filePath, fileName);
+
+            var fileInfo = new FileInfo(filePath);
+
+            var imageData = new ImageData
+            {
+                Id = fileName,
+                Name = fileName,
+                FullPath = filePath,
+                ImageFormat = format,
+                ThumbPath = Path.Combine(_thumbsPath, fileName),
+                HasThumbnail = true,
+                FileSize = fileInfo.Length,
+                CreatedDate = fileInfo.CreationTime,
+                ModifiedDate = fileInfo.LastWriteTime,
+                ImageBlob = memoryStream.ToArray()
+            };
+
+            _context.Images.Add(imageData);
+            await _context.SaveChangesAsync();
 
             return true;
         }
-        catch
+        catch(Exception e)
         {
+            Console.WriteLine($"Failed to upload image: {e.Message}");
             return false;
         }
     }
 
-    public Task<bool> DeleteImageAsync(string fileName)
+    public async Task<bool> DeleteImageAsync(ImageData image)
     {
         try
         {
-            var imagePath = Path.Combine(_galleryPath, fileName);
-            var thumbPath = Path.Combine(_thumbsPath, fileName);
+            var imagePath = Path.Combine(_galleryPath, image.Name);
+            var thumbPath = Path.Combine(_thumbsPath, image.Name);
+            var imageDb = await _context.Images.FindAsync(image.Id);
 
             // Delete original image
             if (File.Exists(imagePath))
@@ -91,11 +118,14 @@ public class ImageService
             if (File.Exists(thumbPath))
                 File.Delete(thumbPath);
 
-            return Task.FromResult(true);
+            _context.Images.Remove(imageDb!);
+
+            return await Task.FromResult(true);
         }
-        catch
+        catch(Exception ex)
         {
-            return Task.FromResult(false);
+            Console.WriteLine($"Failed to delete image: {ex.Message}");
+            return await Task.FromResult(false);
         }
     }
 

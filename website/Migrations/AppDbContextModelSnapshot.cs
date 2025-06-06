@@ -85,6 +85,46 @@ namespace website.Migrations
                     b.ToTable("CodeProjects");
                 });
 
+            modelBuilder.Entity("website.Models.ImageData", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FullPath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("HasThumbnail")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("ImageBlob")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("ImageFormat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ThumbPath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("website.Models.MusicProject", b =>
                 {
                     b.Property<string>("Id")

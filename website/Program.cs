@@ -51,5 +51,6 @@ app.MapAuthenticationEndpoints();
 app.UseStaticFiles();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-    
+
+
 app.Run();

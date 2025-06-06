@@ -23,12 +23,14 @@ public class AboutEntry
 
 public class ImageData: IData
 {
-    public string? Id { get; set; } = null;
+    public string? Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string FullPath { get; set; } = string.Empty;
     public string ThumbPath { get; set; } = string.Empty;
     public bool HasThumbnail { get; set; }
     public long FileSize { get; set; }
+    public string? ImageFormat { get; set; }
+    public byte[]? ImageBlob { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 
