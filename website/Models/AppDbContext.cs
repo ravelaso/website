@@ -8,6 +8,7 @@ namespace website.Models
         public DbSet<MusicProject> MusicProjects { get; set; }
         public DbSet<CodeProject> CodeProjects { get; set; }
         public DbSet<AboutEntry> AboutEntries { get; set; }
+        public DbSet<AllowedUser> AllowedUsers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

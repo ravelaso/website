@@ -13,6 +13,16 @@ namespace website.Services
             _context.Database.EnsureCreated(); // Ensure the database is created
         }
 
+        public async Task<bool> IsUserAllowedAsync(string userId, string userName)
+        {
+            return await _context.AllowedUsers.AnyAsync(u => u.Id == userId && u.Username == userName);
+        }
+
+        public bool IsUserAllowed(string userId, string userName)
+        {
+            return  _context.AllowedUsers.Any(u => u.Id == userId && u.Username == userName);
+        }
+
         public async Task<List<MusicProject>> LoadMusicProjectsAsync()
         {
             return await _context.MusicProjects.ToListAsync();
@@ -55,6 +65,20 @@ namespace website.Services
         {
             return await _context.AboutEntries
                 .FirstOrDefaultAsync(entry => entry.Type == type);
+        }
+
+        public async Task AddOrUpdateAboutEntryAsync(AboutEntry entry)
+        {
+            var existingEntry = await _context.AboutEntries.FindAsync(entry.Id);
+            if (existingEntry != null)
+            {
+                _context.Entry(existingEntry).CurrentValues.SetValues(entry);
+            }
+            else
+            {
+                await _context.AboutEntries.AddAsync(entry);
+            }
+            await _context.SaveChangesAsync();
         }
 
         // New method to delete a music project
