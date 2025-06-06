@@ -68,14 +68,13 @@
     private string _newTags = string.Empty;
     private bool _showConfirmModal;
     private MusicProject? _projectToDelete;
-    private bool _isEditing = false;
+    private bool _isEditing;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var musicData = await DataService.LoadDataAsync<MusicData>("Music.json");
-            _musicProjects = musicData.Projects;
+            _musicProjects = await DataService.LoadMusicProjectsAsync();
         }
         catch
         {
@@ -123,8 +122,8 @@
         {
             Id = project.Id,
             Name = project.Name,
-            Link = project.Link,
             Description = project.Description,
+            Link = project.Link,
             Date = project.Date,
             Tags = new List<string>(project.Tags)
         };
@@ -142,8 +141,8 @@
     {
         if (_projectToDelete is not null)
         {
-            _musicProjects.Remove(_projectToDelete);
-            await SaveData();
+            await DataService.DeleteMusicProjectAsync(_projectToDelete.Id!); // Delete from database
+            _musicProjects.Remove(_projectToDelete); // Update local list
         }
         _projectToDelete = null;
         _showConfirmModal = false;
@@ -157,7 +156,6 @@
 
     private async Task SaveData()
     {
-        var musicData = new MusicData { Projects = _musicProjects };
-        await DataService.SaveDataAsync("Music.json", musicData);
+        await DataService.AddOrUpdateMusicProjectAsync(_newProject);
     }
 }

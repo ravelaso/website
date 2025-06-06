@@ -83,8 +83,8 @@
     {
         try
         {
-            var musicData = await DataService.LoadDataAsync<MusicData>("Music.json");
-            _musicProjects = musicData?.Projects ?? [];
+            var musicData = await DataService.LoadMusicProjectsAsync();
+            _musicProjects = musicData ?? [];
         }
         catch
         {

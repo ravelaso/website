@@ -1,6 +1,7 @@
 using website.Blazor;
 using website.Extensions;
 using Serilog;
+using website.Models;
 using website.Services;
 
 // Load environment variables from .env file
@@ -23,6 +24,8 @@ builder.Host.UseSerilog();
 
 // Add environment variables to configuration
 builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.AddDbContext<AppDbContext>();
 
 // Add services to the container
 builder.Services.AddApplicationServices();
