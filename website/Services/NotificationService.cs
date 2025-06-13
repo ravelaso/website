@@ -1,5 +1,12 @@
 namespace website.Services;
 
+
+public enum NotificationType
+{
+    Success,
+    Error
+}
+
 public class NotificationService
 {
     public event Action? OnNotificationUpdated;
@@ -8,12 +15,12 @@ public class NotificationService
 
     public async Task ShowSuccess(string message)
     {
-        await AddNotification(message, "success");
+        await AddNotification(message, NotificationType.Success);
     }
 
     public async Task ShowError(string message)
     {
-        await AddNotification(message, "error");
+        await AddNotification(message, NotificationType.Error);
     }
 
     public void Dismiss(NotificationMessage notification)
@@ -32,7 +39,7 @@ public class NotificationService
     }
 
 
-    private async Task AddNotification(string message, string type)
+    private async Task AddNotification(string message, NotificationType type)
     {
         var notification = new NotificationMessage
         {
@@ -65,6 +72,6 @@ public class NotificationService
 public class NotificationMessage
 {
     public string? Message { get; init; }
-    public string? Type { get; init; }
+    public NotificationType Type { get; init; }
     public bool Visible { get; set; }
 }
