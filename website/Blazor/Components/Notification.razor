@@ -4,7 +4,11 @@
 <div class="fixed top-5 right-5 z-50 flex flex-col space-y-2">
     @foreach (var notification in NotificationService.Notifications)
     {
-        <div class="@GetCss(notification.Type!) px-4 py-3 rounded shadow-lg text-white font-semibold flex justify-between items-center transition duration-300 ease-in-out">
+        <div class="@($@"transform transition-all duration-300 ease-in-out
+                        px-4 py-3 rounded shadow-lg text-white font-semibold
+                        flex justify-between items-center
+                        {GetCss(notification.Type!)}
+                        {(notification.Visible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0")}")">
             <span>@notification.Message</span>
             <button class="ml-4 text-white font-bold" @onclick="() => Dismiss(notification)">✖</button>
         </div>

@@ -6,9 +6,8 @@
 
 @layout Layout.DashboardLayout
 @rendermode InteractiveServer
-
 <PageTitle>About Management - Dashboard</PageTitle>
-<Notification />
+
 <div class="bg-neutral-950 rounded-xl border border-neutral-800 p-6">
     <h2 class="text-2xl font-bold text-white mb-4">About Sections</h2>
     <p class="text-neutral-400 mb-6">Edit the about sections for Music and Code below.</p>
@@ -54,11 +53,11 @@
         try
         {
             await DataService.AddOrUpdateAboutEntryAsync(_musicAboutEntry);
-            NotificationService.ShowSuccess("Music About Saved!");
+            await NotificationService.ShowSuccess("Music About Saved!");
         }
         catch (Exception e)
         {
-            NotificationService.ShowError(e.Message);
+            await NotificationService.ShowError(e.Message);
         }
     }
 
