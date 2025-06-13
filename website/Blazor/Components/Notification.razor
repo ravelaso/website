@@ -26,10 +26,10 @@
         NotificationService.Dismiss(notification);
     }
 
-    private string GetCss(string type) => type switch
+    private static string GetCss(string type) => type switch
     {
-        "success" => "bg-green-500",
-        "error" => "bg-red-500",
+        "success" => "bg-green-800",
+        "error" => "bg-red-800",
         _ => "bg-gray-500"
     };
 }

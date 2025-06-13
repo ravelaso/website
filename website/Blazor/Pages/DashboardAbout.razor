@@ -53,11 +53,11 @@
         try
         {
             await DataService.AddOrUpdateAboutEntryAsync(_musicAboutEntry);
-            await NotificationService.ShowSuccess("Music About Saved!");
+            _ = NotificationService.ShowSuccess("Music About Saved!");
         }
         catch (Exception e)
         {
-            await NotificationService.ShowError(e.Message);
+            _ = NotificationService.ShowError(e.Message);
         }
     }
 
@@ -66,11 +66,11 @@
         try
         {
             await DataService.AddOrUpdateAboutEntryAsync(_codeAboutEntry);
-            NotificationService.ShowSuccess("Code About Saved!");
+            _ = NotificationService.ShowSuccess("Code About Saved!");
         }
         catch (Exception e)
         {
-            NotificationService.ShowError(e.Message);
+            _ = NotificationService.ShowError(e.Message);
         }
     }
 }
