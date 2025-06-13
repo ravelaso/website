@@ -3,6 +3,7 @@
 @using website.Services
 @layout Layout.DashboardLayout
 @inject DataService DataService
+@inject NotificationService NotificationService
 @rendermode InteractiveServer
 
 <PageTitle>Music Management - Dashboard</PageTitle>
@@ -141,8 +142,9 @@
     {
         if (_projectToDelete is not null)
         {
-            await DataService.DeleteMusicProjectAsync(_projectToDelete.Id!); // Delete from database
+            await DataService.DeleteCodeProjectAsync(_projectToDelete.Id!); // Delete from database
             _musicProjects.Remove(_projectToDelete); // Update local list
+            _ = NotificationService.ShowSuccess($"Music Project Deleted:\r {_projectToDelete.Id}");
         }
         _projectToDelete = null;
         _showConfirmModal = false;
@@ -156,6 +158,16 @@
 
     private async Task SaveData()
     {
-        await DataService.AddOrUpdateMusicProjectAsync(_newProject);
+        try
+        {
+            await DataService.AddOrUpdateMusicProjectAsync(_newProject);
+            _ = NotificationService.ShowSuccess(!_isEditing
+                ? $"Music Project Added:\n {_newProject.Id}"
+                : $"Music Project Edited:\n {_newProject.Id}");
+        }
+        catch (Exception e)
+        {
+            _ = NotificationService.ShowError(e.Message);
+        }
     }
 }

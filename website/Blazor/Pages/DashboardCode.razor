@@ -172,7 +172,7 @@
         }
         catch (Exception e)
         {
-            await NotificationService.ShowError(e.Message);
+            _ = NotificationService.ShowError(e.Message);
         }
     }
 }
