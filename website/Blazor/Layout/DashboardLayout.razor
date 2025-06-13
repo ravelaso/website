@@ -11,6 +11,7 @@
             @if (AuthService.IsAuthorized(context.User))
             {
                 <div class="min-h-screen bg-neutral-950 text-white">
+
                     <!-- Dashboard Header -->
                     <header class="bg-neutral-900 border-b border-neutral-800 shadow-sm">
                         <div class="max-w-7xl mx-auto px-4 py-4">
@@ -19,7 +20,7 @@
                                 <div class="flex items-center space-x-3 text-sm text-neutral-400 mt-2 md:mt-0">
                                     <span>Welcome, @AuthorizationService.GetUserName(context.User)</span>
                                     <img class="w-9 h-9 rounded-full border border-neutral-700 shadow"
-                                         src="@AuthorizationService.GetAvatar(context.User)" alt="Avatar" />
+                                         src="@AuthorizationService.GetAvatar(context.User)" alt="Avatar"/>
                                     <a href="/auth/logout" class="text-neutral-400 hover:text-white">
                                         <span class="w-9 h-9 rounded-full border border-neutral-700 shadow">
                                             Logout
