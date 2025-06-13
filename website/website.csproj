@@ -26,5 +26,14 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Data\" />
+      <Folder Include="wwwroot\images\" />
+      <Folder Include="wwwroot\images\gallery\" />
+      <Folder Include="wwwroot\images\thumbs\" />
+    </ItemGroup>
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\data\aboutcode.json" />
+      <_ContentIncludedByDefault Remove="wwwroot\data\aboutmusic.json" />
+      <_ContentIncludedByDefault Remove="wwwroot\data\Code.json" />
+      <_ContentIncludedByDefault Remove="wwwroot\data\Music.json" />
     </ItemGroup>
 </Project>

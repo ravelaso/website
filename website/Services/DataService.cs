@@ -9,7 +9,7 @@ namespace website.Services
 
         public DataService()
         {
-            _context = new AppDbContext();
+            _context = new();
             _context.Database.EnsureCreated(); // Ensure the database is created
         }
 
