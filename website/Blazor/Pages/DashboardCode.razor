@@ -3,6 +3,7 @@
 @using website.Services
 @layout Layout.DashboardLayout
 @inject DataService DataService
+@inject NotificationService NotificationService
 @rendermode InteractiveServer
 
 
@@ -69,7 +70,7 @@
 
 
 @code {
-    private List<CodeProject> _codeProjects = new();
+    private List<CodeProject> _codeProjects = [];
     private CodeProject _newProject = new();
     private string _newTechnologies = string.Empty;
     private bool _showConfirmModal;
@@ -100,7 +101,6 @@
             if (!_isEditing)
             {
                 _newProject.Id = Guid.NewGuid().ToString();
-                _codeProjects.Add(_newProject);
             }
             else
             {
@@ -110,13 +110,12 @@
                 {
                     _codeProjects.Remove(existing);
                 }
-                _codeProjects.Add(_newProject);
-                _isEditing = false;
             }
 
+            _codeProjects.Add(_newProject);
             await SaveData();
-
             // Reset form
+            _isEditing = false;
             _newProject = new();
             _newTechnologies = string.Empty;
         }
@@ -146,13 +145,24 @@
 
     private async Task ConfirmDelete()
     {
-        if (_projectToDelete is not null)
+        try
         {
-            await DataService.DeleteCodeProjectAsync(_projectToDelete.Id!); // Delete from database
-            _codeProjects.Remove(_projectToDelete); // Update local list
+            if (_projectToDelete is not null)
+            {
+                await DataService.DeleteCodeProjectAsync(_projectToDelete.Id!); // Delete from database
+                _codeProjects.Remove(_projectToDelete); // Update local list
+                _ = NotificationService.ShowSuccess($"Code Project Deleted:\r {_projectToDelete.Id}");
+            }
+
+            _projectToDelete = null;
+            _showConfirmModal = false;
         }
-        _projectToDelete = null;
-        _showConfirmModal = false;
+        catch (Exception e)
+        {
+            _ = NotificationService.ShowError(e.Message);
+            _projectToDelete = null;
+            _showConfirmModal = false;
+        }
     }
 
     private void CancelDelete()
@@ -163,6 +173,16 @@
 
     private async Task SaveData()
     {
-        await DataService.AddOrUpdateCodeProjectAsync(_newProject);
+        try
+        {
+            await DataService.AddOrUpdateCodeProjectAsync(_newProject);
+            _ = NotificationService.ShowSuccess(!_isEditing
+                ? $"Code Project Added:\n {_newProject.Id}"
+                : $"Code Project Edited:\n {_newProject.Id}");
+        }
+        catch (Exception e)
+        {
+            _ = NotificationService.ShowError(e.Message);
+        }
     }
 }

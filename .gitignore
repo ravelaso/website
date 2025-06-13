@@ -8,5 +8,6 @@ riderModule.iml
 node_modules
 /website/wwwroot/images/thumbs/*
 /website/wwwroot/images/gallery/*
+/website/wwwroot/tailwind.css
 /website/Data/*
 *.*.DotSettings.user
