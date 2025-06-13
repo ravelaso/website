@@ -145,14 +145,24 @@
 
     private async Task ConfirmDelete()
     {
-        if (_projectToDelete is not null)
+        try
         {
-            await DataService.DeleteCodeProjectAsync(_projectToDelete.Id!); // Delete from database
-            _codeProjects.Remove(_projectToDelete); // Update local list
-            _ = NotificationService.ShowSuccess($"Code Project Deleted:\r {_projectToDelete.Id}");
+            if (_projectToDelete is not null)
+            {
+                await DataService.DeleteCodeProjectAsync(_projectToDelete.Id!); // Delete from database
+                _codeProjects.Remove(_projectToDelete); // Update local list
+                _ = NotificationService.ShowSuccess($"Code Project Deleted:\r {_projectToDelete.Id}");
+            }
+
+            _projectToDelete = null;
+            _showConfirmModal = false;
         }
-        _projectToDelete = null;
-        _showConfirmModal = false;
+        catch (Exception e)
+        {
+            _ = NotificationService.ShowError(e.Message);
+            _projectToDelete = null;
+            _showConfirmModal = false;
+        }
     }
 
     private void CancelDelete()
