@@ -3,6 +3,7 @@
 @using website.Services
 @layout Layout.DashboardLayout
 @inject ImageService ImageService
+@inject NotificationService NotificationService
 @rendermode InteractiveServer
 
 <PageTitle>Image Gallery - Dashboard</PageTitle>
@@ -195,13 +196,15 @@
                 _message = "Files uploaded. Generating thumbnails...";
                 await ImageService.GenerateAllThumbnailsAsync();
                 _message = "All files uploaded and thumbnails generated!";
+                _ = NotificationService.ShowSuccess("Uploaded!");
             }
             _uploadQueue.Clear();
             await RefreshGallery();
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _message = $"Error: {ex.Message}";
+            _message = $"Error: {e.Message}";
+            _ = NotificationService.ShowError(e.Message);
         }
     }
 
@@ -219,13 +222,22 @@
 
     private async Task ConfirmDelete()
     {
-        if (_imageToDelete is not null)
+        try
         {
-            await DeleteImage(_imageToDelete);
-        }
+            if (_imageToDelete is not null)
+            {
+                await DeleteImage(_imageToDelete);
+            }
 
-        _imageToDelete = null;
-        _showConfirmModal = false;
+            _imageToDelete = null;
+            _showConfirmModal = false;
+        }
+        catch (Exception e)
+        {
+            await NotificationService.ShowError(e.Message);
+            _imageToDelete = null;
+            _showConfirmModal = false;
+        }
     }
 
     private void CancelDelete()
@@ -239,6 +251,7 @@
         if (success)
         {
             _message = $"Image '{image.Name}' deleted successfully!";
+            await NotificationService.ShowSuccess($"Image deleted: {image.Name}");
             await RefreshGallery();
         }
         else
