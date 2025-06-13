@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<AuthorizationService>();
         services.AddScoped<ImageService>();
         services.AddScoped<DataService>();
+        services.AddScoped<NotificationService>();
 
         return services;
     }

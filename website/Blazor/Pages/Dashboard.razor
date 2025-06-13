@@ -1,10 +1,8 @@
 @page "/dashboard"
 @inject NavigationManager Navigation
+@layout Layout.DashboardLayout
 
-@code {
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        Navigation.NavigateTo(Navigation.BaseUri +  "dashboard/images"); ;
-    }
-}
+<div class="container align-middle content-center font-bold bg-black text-white">
+    Welcome to the Dashboard
+</div>
+
