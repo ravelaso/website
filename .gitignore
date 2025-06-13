@@ -9,4 +9,4 @@ node_modules
 /website/wwwroot/images/thumbs/*
 /website/wwwroot/images/gallery/*
 /website/Data/*
-*.DotSettings.user
+*.*.DotSettings.user
