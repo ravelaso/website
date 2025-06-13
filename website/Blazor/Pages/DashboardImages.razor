@@ -221,7 +221,7 @@
     {
         if (_imageToDelete is not null)
         {
-            await DeleteImage(_imageToDelete.Name);
+            await DeleteImage(_imageToDelete);
         }
 
         _imageToDelete = null;
@@ -233,17 +233,17 @@
         _imageToDelete = null;
         _showConfirmModal = false;
     }
-    private async Task DeleteImage(string fileName)
+    private async Task DeleteImage(ImageData image)
     {
-        var success = await ImageService.DeleteImageAsync(fileName);
+        var success = await ImageService.DeleteImageAsync(image);
         if (success)
         {
-            _message = $"Image '{fileName}' deleted successfully!";
+            _message = $"Image '{image.Name}' deleted successfully!";
             await RefreshGallery();
         }
         else
         {
-            _message = $"Failed to delete image '{fileName}'";
+            _message = $"Failed to delete image '{image.Name}'";
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using website.Models;
 
@@ -10,9 +11,11 @@ using website.Models;
 namespace website.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250606161158_ImageBlob")]
+    partial class ImageBlob
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
@@ -105,9 +108,6 @@ namespace website.Migrations
 
                     b.Property<byte[]>("ImageBlob")
                         .HasColumnType("BLOB");
-
-                    b.Property<string>("ImageFormat")
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("TEXT");
