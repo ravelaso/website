@@ -1,0 +1,31 @@
+services:
+  website:
+    image: website:latest
+    expose:
+      - "2000" # Expose port 2000 internally to the Nginx service
+    environment:
+      - GITHUB_CLIENT_ID=fill # Replace with your actual GitHub Client ID
+      - GITHUB_CLIENT_SECRET=fill # Replace with your actual GitHub Client Secret
+      - ASPNETCORE_ENVIRONMENT=fill # Replace with your desired ASP.NET environment
+      - DOTNET_ENVIRONMENT=fill # Replace with your desired .NET environment
+    volumes:
+      - ./website/data:/app/Data/ # Mount local data directory
+      - ./website/images:/app/wwwroot/images/ # Mount local images directory
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf # Mount your Nginx configuration file
+      - ./ssl/fullchain.pem:/etc/ssl/certs/fullchain.pem # Mount SSL certificate
+      - ./ssl/privkey.pem:/etc/ssl/private/privkey.pem # Mount SSL private key
+    ports:
+      - "8080:80" # Map host port 8080 to container port 80 (for HTTP)
+      - "8443:443" # Map host port 8443 to container port 443 (for HTTPS)
+    networks:
+      - webapp-network # Connect to the external network
+    depends_on:
+      - website # Ensure Nginx starts after the website service
+
+networks:
+  webapp-network:
+    external: true # Use an external network created beforehand
