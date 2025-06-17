@@ -34,6 +34,6 @@ WORKDIR /app
 COPY --from=dotnet-build /app/publish .
 
 # Expose port
-EXPOSE 8080
+EXPOSE 2000
 
 ENTRYPOINT ["dotnet", "website.dll"]

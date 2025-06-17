@@ -27,5 +27,6 @@ services:
       - website # Ensure Nginx starts after the website service
 
 networks:
-  webapp-network:
-    external: true # Use an external network created beforehand
+  default:
+    external: true
+    name: webapp-network
